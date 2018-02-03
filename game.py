@@ -87,10 +87,6 @@ def self_play(session, agent, env, train_data):
 
                 temp_history = []
         t2 = time.time()
-        if print_analytics:
-            print("Agent score: " + str(agent_score))
-            print("OpenAI score: " + str(OpenAI_bot_score))
-            print(t2)
 
     #env.render(close=True)
     return OpenAI_bot_score, agent_score
