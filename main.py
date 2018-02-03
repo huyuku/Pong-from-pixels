@@ -35,7 +35,7 @@ def main_function():
                     if print_analytics:
                         print("Self-play time: %s seconds." % (t2-t1))
                         t1 = time.time()
-                OpenAI_score, agent_score = self_play(sess, agent, env, train_data)
+                OpenAI_score, agent_score = game.self_play(sess, agent, env, train_data)
                 if agent_score>OpenAI_score:
                     wins += 1
                 else:
