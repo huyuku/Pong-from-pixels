@@ -3,6 +3,7 @@ import numpy as np
 import random
 import gym
 import numpy as np
+import cProfile
 
 #HYPERPARAMETERS
 num_self_play_games = 50000
@@ -108,24 +109,27 @@ class BasicAgent():
 
 agent = BasicAgent()
 env = gym.make('Pong-v0')
-                               
-with tf.Session() as sess:	
-    sess.run(tf.global_variables_initializer()) 
-    for i in range(num_iterations):
-        print("Iteration %s. Resetting dataset" % i)
-        train_data = train_set()
-    
-        print("Starting self-play...")
-        for n in range(num_self_play_games):
-          if n%100 == 0:
-            print("Self-play game: %s" %n)
-    
-          self_play(sess, agent, env, train_data)
-        print("Starting training...")
-        for e in range(num_train_epochs):
-          diff_frames, actions, wins = train_data.sample(train_batch_size)
-          loss = agent.train(sess, diff_frames, actions, wins)
-          print("Loss epoch %s: %s" % (e, loss))
+
+cProfile.run('mainfunction()')
+ 
+def mainfunction():
+	with tf.Session() as sess:	
+	    sess.run(tf.global_variables_initializer()) 
+	    for i in range(num_iterations):
+		print("Iteration %s. Resetting dataset" % i)
+		train_data = train_set()
+
+		print("Starting self-play...")
+		for n in range(num_self_play_games):
+		  if n%100 == 0:
+		    print("Self-play game: %s" %n)
+
+		  self_play(sess, agent, env, train_data)
+		print("Starting training...")
+		for e in range(num_train_epochs):
+		  diff_frames, actions, wins = train_data.sample(train_batch_size)
+		  loss = agent.train(sess, diff_frames, actions, wins)
+		  print("Loss epoch %s: %s" % (e, loss))
                                
                                
  
