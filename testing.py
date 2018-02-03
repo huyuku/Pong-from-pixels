@@ -69,7 +69,7 @@ def diff_frame(ordered_frames):
 agent = agents.BasicAgent(learning_rate)
 env = gym.make('Pong-v0')
 
-cProfile.run('mainfunction()')
+cProfile.run('main_function()')
 
 def main_function():
 	with tf.Session() as sess:
