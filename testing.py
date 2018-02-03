@@ -7,11 +7,11 @@ import agents
 
 #HYPERPARAMETERS
 num_self_play_games = 50000
-num_train_epochs = 100 #Change to something plausible later
-train_batch_size = 20
-num_iterations = 1 #Number of self-play/training loops
-learning_rate = 0.01
-hidden_size_1 = 100000
+num_train_epochs    = 100 #Change to something plausible later
+train_batch_size    = 20
+num_iterations      = 1 #Number of self-play/training loops
+learning_rate       = 0.01
+hidden_size         = 100000
 
 class train_set():
 	'''Storing self-play games for training'''
@@ -66,7 +66,7 @@ def preprocess(frame):
 def diff_frame(ordered_frames):
 	return np.expand_dims(preprocess(ordered_frames[0] - ordered_frames[1]),0)
 
-agent = agents.BasicAgent(learning_rate)
+agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
 cProfile.run('main_function()')

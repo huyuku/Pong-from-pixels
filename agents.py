@@ -4,18 +4,19 @@ import numpy as np
 class BasicAgent():
     '''
     This agent uses a 1-hidden-layer dense NN to compute probability of going UP.
+
+    parameters:
+    hidden_size   controls the number of nodes in the hidden layer.
+    learning_rate controls the learning rate of the gradient descent optimiser.
     '''
-    def __init__(self, learning_rate):
-        '''
-        learning_rate controls the learning rate of the gradient descent optimiser.
-        '''
+    def __init__(self, hidden_size, learning_rate):
 
         def weight_variable(shape):
             initial = tf.truncated_normal(shape, stddev=0.05)
             return tf.Variable(initial)
 
-        self.W1 = weight_variable([80*80, hidden_size_1])
-        self.W2 = weight_variable([hidden_size_1, 1])
+        self.W1 = weight_variable([80*80, hidden_size])
+        self.W2 = weight_variable([hidden_size, 1])
 
         self.input_vectors = tf.placeholder(shape=(None, 80*80), dtype=tf.float32)  # flattened diff_frame
         self.actions       = tf.placeholder(shape=(None,1),      dtype=tf.float32)  # 1 if agent went UP, 0 otherwise
