@@ -73,7 +73,7 @@ def self_play(session, agent, env, train_data):
         #main train data object once we have a reward r, which gives the complete data-point (s, a, r)
         temp_history.extend([[diff_frame(frame_buffer), a-3]])
         if abs(r) == 1:
-	# Update the score
+			# Update the score
 			if r == 1:
 				agent_score += 1
 			else:
