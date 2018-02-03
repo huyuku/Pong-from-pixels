@@ -17,8 +17,10 @@ def preprocess(frame):
 	frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
 	return frame.astype(np.float).ravel()
 
+	return frame.astype(np.float).ravel()
+
 def ex(preprocessed_frames):
-	'''expand array along first dimension, used if running the network with batch_size=1'''
+    '''expand array along first dimension, used if running the network with batch_size=1'''
     return np.expand_dims(preprocessed_frames,0)
 
 def diff_frame(ordered_frames):
@@ -82,7 +84,7 @@ def self_play(session, agent, env, train_data):
         temp_history.extend([[diff_frame(frame_buffer), a]])
         if abs(r) == 1:
 			# Update the scores
-			if r == 1:
+            if r == 1:
                 agent_score += 1
             else:
                 OpenAI_bot_score += 1
@@ -139,7 +141,7 @@ def main_function():
                 loss = agent.train(sess, diff_frames, actions, wins)
                 print("Loss epoch %s: %s" % (e, loss))
 
-if main.print_analytics:
+if print_analytics:
 	cProfile.run('main_function()')
 else:
 	main_function()
