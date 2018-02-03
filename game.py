@@ -55,12 +55,12 @@ def self_play(session, agent, env, train_data):
     frame_buffer = [0,0] # "Working memory" of recent frames
 
     for m in range(2):
-        env.render()
+        #env.render()
         frame_buffer[m], r, done, i = env.step(env.action_space.sample()) # take a random action
 
     t1 = time.time()
     while not done:
-        env.render()
+        #env.render()
         if without_net:
             a = env.action_space.sample()
         else:
@@ -97,7 +97,7 @@ def self_play(session, agent, env, train_data):
             elif t_diff > 1:
                 print("Self-play loop has run for one seconds.")
 
-    env.render(close=True)
+    #env.render(close=True)
     return OpenAI_bot_score, agent_score
 
 #define preprocessing functions
