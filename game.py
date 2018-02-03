@@ -79,23 +79,16 @@ def self_play(session, agent, env, train_data):
                 OpenAI_bot_score += 1
 
             if quick_self_play: #Whether to play first to 20 wins or just first to 1
-		pass
-                #done = True
+                done = True
             else:
                 for entry in temp_history: #Update main train data-set
                     train_data.add(entry[0], entry[1], r)
 
                 temp_history = []
-
         t2 = time.time()
         if print_analytics:
-            t_diff = int(t2-t1)
-            if t_diff > 100:
-                print("Self-play loop has run for 100 seconds!")
-            elif t_diff > 10:
-                print("Self-play loop has run for 10 seconds.")
-            elif t_diff > 1:
-                print("Self-play loop has run for one seconds.")
+            print(t2)
+
 
     #env.render(close=True)
     return OpenAI_bot_score, agent_score
