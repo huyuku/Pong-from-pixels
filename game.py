@@ -60,7 +60,7 @@ def self_play(session, agent, env, train_data):
         if without_net:
             a = env.action_space.sample()
         else:
-            a = agent.action(session, ex(diff_frame(s)))
+            a = agent.action(session, ex(diff_frame(frame_buffer)))
         #Update the short term memory
         frame_buffer[0]=frame_buffer[1]
         frame_buffer[1], r, done, i = env.step(a+3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
