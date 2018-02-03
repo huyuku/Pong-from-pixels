@@ -5,6 +5,7 @@ import gym
 #import cProfile
 import agents
 import game
+from game import *
 from config import *
 import time
 import logging
