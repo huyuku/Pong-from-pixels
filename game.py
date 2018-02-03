@@ -57,6 +57,7 @@ def self_play(session, agent, env, train_data):
         env.render()
         frame_buffer[m], r, done, i = env.step(env.action_space.sample()) # take a random action
 
+    t1 = time.time()
     while not done:
         env.render()
         if without_net:
