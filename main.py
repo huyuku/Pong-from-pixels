@@ -10,11 +10,6 @@ from config import *
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
-if print_analytics:
-	cProfile.run('main_function()') #Probably not very helpful
-else:
-	main_function()
-
 def main_function():
 	with tf.Session() as sess:
 		sess.run(tf.global_variables_initializer())
@@ -34,3 +29,7 @@ def main_function():
 				diff_frames, actions, wins = train_data.sample(train_batch_size)
 				loss = agent.train(sess, diff_frames, actions, wins)
 				print("Loss epoch %s: %s" % (e, loss))
+if print_analytics:
+	cProfile.run('main_function()') #Probably not very helpful
+else:
+	main_function()
