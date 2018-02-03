@@ -48,11 +48,11 @@ def self_play(session, agent, env, train_data):
     temp_history = []
     OpenAI_bot_score = 0
     agent_score = 0
-    s = [0,0] # "Working memory" of recent frames
+    frame_buffer = [0,0] # "Working memory" of recent frames
 
     for m in range(2):
         env.render()
-        s[m], r, done, i = env.step(env.action_space.sample()) # take a random action
+        frame_buffer[m], r, done, i = env.step(env.action_space.sample()) # take a random action
 
     while not done:
         env.render()
@@ -61,11 +61,11 @@ def self_play(session, agent, env, train_data):
         else:
             a = agent.action(session, ex(diff_frame(s)))
         #Update the short term memory
-        s[0]=s[1]
-        s[1], r, done, i = env.step(a+3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
+        frame_buffer[0]=frame_buffer[1]
+        frame_buffer[1], r, done, i = env.step(a+3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
         #Add the state action pair (s, a) to the temporary history, later to be added to the
         #main train data object once we have a reward r, which gives the complete data-point (s, a, r)
-        temp_history.extend([[diff_frame(s), a]])
+        temp_history.extend([[diff_frame(frame_buffer), a]])
         if abs(r) == 1:
 			# Update the scores
 			if r == 1:
