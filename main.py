@@ -11,6 +11,7 @@ import logging
 
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
+logging.basicConfig(filename='info.log',level=logging.INFO)
 
 def main_function():
 	with tf.Session() as sess:

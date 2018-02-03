@@ -77,5 +77,5 @@ class BasicAgent():
         t2 = time.time()
         if print_analytics:
             if (t2-t1) > 1:
-                print("Agent took %s seconds to train" % (t2-t1))
+                print("Agent took %s seconds to train!" % (t2-t1))
         return loss
