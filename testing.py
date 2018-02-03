@@ -9,13 +9,12 @@ import agents
 num_self_play_games = 50000
 num_train_epochs = 100 #Change to something plausible later
 train_batch_size = 20
-num_iterations = 1
+num_iterations = 1 #Number of self-play/training loops
 learning_rate = 0.01
 hidden_size_1 = 100000
 
 class train_set():
 	'''Storing self-play games for training'''
-	'''NOTE: CURRENTLY DOESN'T DEAL WITH DIFF FRAMES'''
 	def __init__(self, size = 1000000):
 		self.history = []
 		self.size = size
