@@ -16,7 +16,6 @@ hidden_size = 100
 without_net = False
 quick_self_play = True #For testing
 
-
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
