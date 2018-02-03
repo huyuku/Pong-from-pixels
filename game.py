@@ -2,6 +2,8 @@
 This module is used to generate data by having the agent play pong.
 '''
 import tensorflow as tf
+import random
+import numpy as np
 import agents
 import gym
 import cProfile
