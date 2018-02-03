@@ -5,7 +5,10 @@ This module is used to generate data by having the agent play pong.
 import agents
 import gym
 import cProfile
+<<<<<<< HEAD
 import main
+=======
+>>>>>>> 9efe4986c6fd1081cd97fd3e31e2ade170160dea
 
 #define preprocessing functions.
 def preprocess(frame):
@@ -36,6 +39,10 @@ learning_rate = 0.01
 hidden_size = 100
 without_net = False
 quick_self_play = True #For testing
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9efe4986c6fd1081cd97fd3e31e2ade170160dea
 
 debug = False
 displaying_analytics = False
