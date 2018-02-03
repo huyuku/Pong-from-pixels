@@ -54,13 +54,13 @@ def self_play(session, agent, env, train_data):
             a = agent.action(session, ex(diff_frame(s)))
         #Update the short term memory
         s[0]=s[1]
-        s[1], r, done, i = env.step(a+3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
+        s[1], r, done, i = env.step(a-3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
         #Add the state action pair (s, a) to the temporary history, later to be added to the
         #main train data object once we have a reward r, which gives the complete data-point (s, a, r)
         temp_history.extend([[diff_frame(s), a]])
         if abs(r) == 1:
-			# Update the scores
-			if r == 1:
+            # Update the scores
+            if r == 1:
                 agent_score += 1
             else:
                 OpenAI_bot_score += 1
@@ -87,7 +87,7 @@ def preprocess(frame):
 	return frame.astype(np.float).ravel()
 
 def ex(preprocessed_frames):
-	'''expand array along first dimension, used if running the network with batch size = 1'''
+    '''expand array along first dimension, used if running the network with batch size = 1'''
     return np.expand_dims(preprocessed_frames,0)
 
 def diff_frame(ordered_frames):
@@ -97,24 +97,24 @@ def diff_frame(ordered_frames):
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
-cProfile.run('main_function()')
 
 def main_function():
-	with tf.Session() as sess:
-		sess.run(tf.global_variables_initializer())
-		for i in range(num_iterations):
-			print("Iteration %s. Resetting dataset" % i)
-			train_data = train_set()
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        for i in range(num_iterations):
+            print("Iteration %s. Resetting dataset" % i)
+            train_data = train_set()
+            
+            print("Starting self-play...")
+            for n in range(num_self_play_games):
+                if n%100 == 0:
+                    print("Self-play game: %s" %n)
+                self_play(sess, agent, env, train_data)
 
-			print("Starting self-play...")
-			for n in range(num_self_play_games):
-				if n%100 == 0:
-					print("Self-play game: %s" %n)
+            print("Starting training...")
+            for e in range(num_train_epochs):
+                diff_frames, actions, wins = train_data.sample(train_batch_size)
+                loss = agent.train(sess, diff_frames, actions, wins)
+                print("Loss epoch %s: %s" % (e, loss))
 
-			  self_play(sess, agent, env, train_data)
-
-			print("Starting training...")
-			for e in range(num_train_epochs):
-				diff_frames, actions, wins = train_data.sample(train_batch_size)
-				loss = agent.train(sess, diff_frames, actions, wins)
-				print("Loss epoch %s: %s" % (e, loss))
+cProfile.run('main_function()')
