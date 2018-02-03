@@ -5,9 +5,13 @@ class BasicAgent():
     '''
     This agent uses a 1-hidden-layer dense NN to compute probability of going UP.
 
-    parameters:
-    hidden_size   controls the number of nodes in the hidden layer.
-    learning_rate controls the learning rate of the gradient descent optimiser.
+    arguments:
+
+    hidden_size, default=100
+        controls the number of nodes in the hidden layer.
+
+    learning_rate, default=0.01
+        controls the learning rate of the gradient descent optimiser.
     
     '''
     def __init__(self, hidden_size=100, learning_rate=0.01):
