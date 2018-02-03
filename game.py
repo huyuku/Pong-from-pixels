@@ -85,7 +85,8 @@ def self_play(session, agent, env, train_data):
 
                 temp_history = []
         t2 = time.time()
-        
+        if print_analytics:
+            print(t2)
 
 
     env.render(close=True)
