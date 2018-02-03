@@ -6,6 +6,8 @@ import numpy as np
 env = gym.make('Pong-v0')
 #import sklearn as sk
 
+#TESTEDIT JOAR
+
 #HYPERPARAMETERS
 num_self_play_games = 50000
 num_train_epochs = 100 #Change to something plausible later
