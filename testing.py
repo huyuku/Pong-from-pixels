@@ -11,7 +11,7 @@ num_train_epochs = 100 #Change to something plausible later
 train_batch_size = 20
 num_iterations = 1
 learning_rate = 0.01
-hidden_size_1 = 100000
+hidden_size = 100000
 without_net = False
 quick_self_play = True #For testing
 
@@ -41,11 +41,11 @@ def self_play(session, agent, env, train_data):
     OpenAI_bot_score = 0
     agent_score = 0
     s = [0,0] # "Working memory" of recent frames
-	
+
     for m in range(2):
         env.render()
         s[m], r, done, i = env.step(env.action_space.sample()) # take a random action
-      
+
     while not done:
         env.render()
         if without_net:
@@ -57,22 +57,22 @@ def self_play(session, agent, env, train_data):
         s[1], r, done, i = env.step(a+3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
         #Add the state action pair (s, a) to the temporary history, later to be added to the
         #main train data object once we have a reward r, which gives the complete data-point (s, a, r)
-        temp_history.extend([[diff_frame(s), a]]) 
+        temp_history.extend([[diff_frame(s), a]])
         if abs(r) == 1:
 			# Update the scores
 			if r == 1:
                 agent_score += 1
             else:
                 OpenAI_bot_score += 1
-	
-            if quick_self_play: #Whether to play first to 20 wins or just first to 1 
+
+            if quick_self_play: #Whether to play first to 20 wins or just first to 1
                 done = True
             else:
                 for entry in temp_history: #Update main train data-set
                     train_data.add(entry[0], entry[1], r)
-                    
+
                 temp_history = []
-    
+
     env.render(close=True)
     return OpenAI_bot_score, agent_score
 
@@ -89,12 +89,12 @@ def preprocess(frame):
 def ex(preprocessed_frames):
 	'''expand array along first dimension, used if running the network with batch size = 1'''
     return np.expand_dims(preprocessed_frames,0)
-    
+
 def diff_frame(ordered_frames):
 	'''compares frames from the current and last timestep, in order to be able to capture motion'''
 	return preprocess(ordered_frames[0] - ordered_frames[1])
 
-agent = agents.BasicAgent(learning_rate)
+agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
 cProfile.run('main_function()')

@@ -8,6 +8,7 @@ class BasicAgent():
     parameters:
     hidden_size   controls the number of nodes in the hidden layer.
     learning_rate controls the learning rate of the gradient descent optimiser.
+    
     '''
     def __init__(self, hidden_size, learning_rate):
 
