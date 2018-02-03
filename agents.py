@@ -45,11 +45,11 @@ class BasicAgent():
         '''returns a probability of going UP at this frame'''
         feed_dict = {self.input_vectors:diff_frame}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
-        action = np.random.binomial(1, predicted_action)
+        action = 3 + np.random.binomial(1, predicted_action)
         return action
 
     def gym_action(self, sess, diff_frame):
-        return 3 + self.action(self, sess, diff_frame)
+        return 3 + self.action(sess, diff_frame)
 
     def train(self, sess, diff_frames, actions, wins):
         '''trains the agent on the data'''
