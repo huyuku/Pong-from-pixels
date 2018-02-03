@@ -34,7 +34,7 @@ learning_rate = 0.01
 hidden_size = 100
 without_net = False
 quick_self_play = True #For testing
-=======
+
 
 debug = False
 displaying_analytics = False
