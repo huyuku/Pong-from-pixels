@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import gym
-import cProfile
+#import cProfile
 import agents
 import game
 from config import *

@@ -6,7 +6,7 @@ import random
 import numpy as np
 import agents
 import gym
-import cProfile
+#import cProfile
 import time
 from config import *
 import logging
@@ -135,7 +135,7 @@ def main_function():
                     if print_analytics:
                         print("Self-play time: %s seconds." % (t2-t1))
                         t1 = time.time()
-                agent_score, OpenAI_score = self_play(sess, agent, env, train_data)
+                OpenAI_score, agent_score = self_play(sess, agent, env, train_data)
                 if agent_score>OpenAI_score:
                     wins += 1
                 else:
@@ -152,7 +152,4 @@ def main_function():
                     print("Train epoch time: %s seconds." % (t2-t1))
                 t1 = t2
 
-if print_analytics:
-    cProfile.run('main_function()') #Probably not very helpful
-else:
-    main_function()
+main_function()
