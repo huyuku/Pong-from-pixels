@@ -51,7 +51,7 @@ class BasicAgent():
         t2 = time.time()
         if print_analytics:
             if (t2-t1) > 1:
-                print("Agent took " + str(t2-t1) + " seconds to generate action!")
+                print("Agent took %s seconds to generate action!" % (t2-t1))
         return action
 
     def gym_action(self, sess, diff_frame):
@@ -65,5 +65,5 @@ class BasicAgent():
         t2 = time.time()
         if print_analytics:
             if (t2-t1) > 1:
-                print("Agent took " + str(t2-t1) + " seconds to train")
+                print("Agent took %s seconds to train" % (t2-t1))
         return loss

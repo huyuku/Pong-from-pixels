@@ -87,6 +87,8 @@ def self_play(session, agent, env, train_data):
                 temp_history = []
         t2 = time.time()
         if print_analytics:
+            print("Agent score: " + str(agent_score))
+            print("OpenAI score: " + str(OpenAI_bot_score))
             print(t2)
 
     #env.render(close=True)
@@ -114,6 +116,8 @@ agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
 def main_function():
+    wins = 0
+    losses = 0
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for i in range(num_iterations):
@@ -126,10 +130,15 @@ def main_function():
                 if n%100 == 0:
                     t2 = time.time()
                     print("Self-play game: %s" %n)
+                    print("Current score: %s wins, %s losses." % (wins, losses))
                     if print_analytics:
-                        print("Self-play time: " + str(t2-t1) + " seconds.")
+                        print("Self-play time: %s seconds." % (t2-t1))
                         t1 = time.time()
-                self_play(sess, agent, env, train_data)
+                agent_score, OpenAI_score = self_play(sess, agent, env, train_data)
+                if agent_score>OpenAI_score:
+                    wins += 1
+                else:
+                    losses += 1
 
             print("Starting training...")
             t1 = time.time()
@@ -139,7 +148,7 @@ def main_function():
                 print("Loss epoch %s: %s" % (e, loss))
                 t2 = time.time()
                 if print_analytics:
-                    print("Train epoch time: " + str(t2-t1) + " seconds.")
+                    print("Train epoch time: %s seconds." % (t2-t1))
                 t1 = t2
 
 if print_analytics:

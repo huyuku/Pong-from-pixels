@@ -27,7 +27,7 @@ def main_function():
 					print("Self-play game: %s" %n)
 					t2 = time.time()
 					if print_analytics:
-						print("Self-play time: " + str(t2-t1) + " seconds.")
+						print("Self-play time: %s seconds." % (t2-t1))
 					t1 = t2
 				self_play(sess, agent, env, train_data)
 
@@ -39,4 +39,4 @@ def main_function():
 				print("Loss epoch %s: %s" % (e, loss))
 				t2 = time.time()
 				if print_analytics:
-					print("Train epoch time: " + str(t2-t1) + " seconds.")
+					print("Train epoch time: seconds." % (t2-t1))
