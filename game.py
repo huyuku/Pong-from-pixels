@@ -17,8 +17,6 @@ def preprocess(frame):
 	frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
 	return frame.astype(np.float).ravel()
 
-	return frame.astype(np.float).ravel()
-
 def ex(preprocessed_frames):
     '''expand array along first dimension, used if running the network with batch_size=1'''
     return np.expand_dims(preprocessed_frames,0)
@@ -26,19 +24,6 @@ def ex(preprocessed_frames):
 def diff_frame(ordered_frames):
 	'''compares frames from the current and last timestep, in order to be able to capture motion'''
 	return preprocess(ordered_frames[0] - ordered_frames[1])
-
-#HYPERPARAMETERS AND SETTINGS
-num_self_play_games = 50000
-num_train_epochs = 100 #Change to something plausible later
-train_batch_size = 20
-num_iterations = 1
-learning_rate = 0.01
-hidden_size = 100
-without_net = False
-quick_self_play = True #For testing
-
-debug = False
-displaying_analytics = False
 
 class train_set():
 	'''Storing self-play games for training'''
@@ -142,6 +127,6 @@ def main_function():
                 print("Loss epoch %s: %s" % (e, loss))
 
 if print_analytics:
-	cProfile.run('main_function()')
+	cProfile.run('main_function()') #Probably not very helpful
 else:
 	main_function()
