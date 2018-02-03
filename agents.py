@@ -19,11 +19,11 @@ class BasicAgent():
         self.W2 = weight_variable([hidden_size, 1])
 
         self.input_vectors = tf.placeholder(shape=(None, 80*80), dtype=tf.float32)  # flattened diff_frame
-        self.actions       = tf.placeholder(shape=(None,1),      dtype=tf.float32)  # 1 if agent went UP, 0 otherwise
-        self.rewards       = tf.placeholder(shape=(None,1),      dtype=tf.float32)  # 1 if frame comes from a won game, -1 otherwise
+        self.actions       = tf.placeholder(shape=(None, 1),     dtype=tf.float32)  # 1 if agent went UP, 0 otherwise
+        self.rewards       = tf.placeholder(shape=(None, 1),     dtype=tf.float32)  # 1 if frame comes from a won game, -1 otherwise
 
         self.hidden_layer = tf.nn.relu(tf.matmul(self.input_vectors, self.W1))
-        self.output_layer = tf.nn.sigmoid(tf.matmul(hidden_layer, self.W2))
+        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2))
 
         # loss = - sum over i of reward_i * p(action_i | frame_i)
         self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)))
