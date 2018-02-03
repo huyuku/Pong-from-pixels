@@ -5,7 +5,7 @@ import gym
 import cProfile
 import agents
 
-#HYPERPARAMETERS
+#HYPERPARAMETERS AND SETTINGS
 num_self_play_games = 50000
 num_train_epochs = 100 #Change to something plausible later
 train_batch_size = 20
@@ -14,6 +14,9 @@ learning_rate = 0.01
 hidden_size = 100
 without_net = False
 quick_self_play = True #For testing
+
+debug = False
+displaying_analytics = False
 
 class train_set():
 	'''Storing self-play games for training'''
@@ -104,7 +107,7 @@ def main_function():
         for i in range(num_iterations):
             print("Iteration %s. Resetting dataset" % i)
             train_data = train_set()
-            
+
             print("Starting self-play...")
             for n in range(num_self_play_games):
                 if n%100 == 0:
