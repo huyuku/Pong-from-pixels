@@ -32,7 +32,7 @@ with tf.Session() as sess:
 			if n%100 == 0:
 				print("Self-play game: %s" %n)
 
-		  self_play(sess, agent, env, train_data)
+			self_play(sess, agent, env, train_data)
 
 		print("Starting training...")
 		for e in range(num_train_epochs):
