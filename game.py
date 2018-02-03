@@ -79,6 +79,7 @@ def self_play(session, agent, env, train_data):
                 OpenAI_bot_score += 1
 
             if quick_self_play: #Whether to play first to 20 wins or just first to 1
+		pass
                 #done = True
             else:
                 for entry in temp_history: #Update main train data-set
