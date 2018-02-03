@@ -23,7 +23,7 @@ def main_function():
         sess.run(tf.global_variables_initializer())
         for i in range(num_iterations):
             print("Iteration %s. Resetting dataset" % i)
-            train_data = train_set()
+            train_data = game.train_set()
 
             print("Starting self-play...")
             t1 = time.time()
