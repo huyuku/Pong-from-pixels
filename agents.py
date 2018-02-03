@@ -3,31 +3,42 @@ import numpy as np
 
 class BasicAgent():
     '''
-    This agent uses a 1-hidden-layer dense NN to compute probability of going UP.
+    Uses a 1-hidden-layer dense NN to compute probability of going UP,
+    then samples using that probability to decide its action.
+
+    * arguments:
+
+    hidden_size, default=100
+        controls the number of nodes in the hidden layer.
+
+    learning_rate, default=0.01
+        controls the learning rate of the optimiser used for training.
+
+    * comments:
+
+    uses tf.AdamOptimiser for its training step.
+
     '''
-    def __init__(self, learning_rate):
-        '''
-        learning_rate controls the learning rate of the gradient descent optimiser.
-        '''
+    def __init__(self, hidden_size=100, learning_rate=0.01):
 
         def weight_variable(shape):
             initial = tf.truncated_normal(shape, stddev=0.05)
             return tf.Variable(initial)
 
-        self.W1 = weight_variable([80*80, hidden_size_1])
-        self.W2 = weight_variable([hidden_size_1, 1])
+        self.W1 = weight_variable([80*80, hidden_size])
+        self.W2 = weight_variable([hidden_size, 1])
 
         self.input_vectors = tf.placeholder(shape=(None, 80*80), dtype=tf.float32)  # flattened diff_frame
-        self.actions       = tf.placeholder(shape=(None,1),      dtype=tf.float32)  # 1 if agent went UP, 0 otherwise
-        self.rewards       = tf.placeholder(shape=(None,1),      dtype=tf.float32)  # 1 if frame comes from a won game, -1 otherwise
+        self.actions       = tf.placeholder(shape=(None, 1),     dtype=tf.float32)  # 1 if agent went UP, 0 otherwise
+        self.rewards       = tf.placeholder(shape=(None, 1),     dtype=tf.float32)  # 1 if frame comes from a won game, -1 otherwise
 
         self.hidden_layer = tf.nn.relu(tf.matmul(self.input_vectors, self.W1))
-        self.output_layer = tf.nn.sigmoid(tf.matmul(hidden_layer, self.W2))
+        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2))
 
         # loss = - sum over i of reward_i * p(action_i | frame_i)
         self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)))
 
-        self.GD = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+        self.GD = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
