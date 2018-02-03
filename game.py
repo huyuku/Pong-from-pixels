@@ -84,6 +84,8 @@ def self_play(session, agent, env, train_data):
                     train_data.add(entry[0], entry[1], r)
 
                 temp_history = []
+        t2 = time.time()
+
 
     env.render(close=True)
     return OpenAI_bot_score, agent_score
@@ -109,7 +111,6 @@ def diff_frame(ordered_frames):
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
-
 def main_function():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -129,7 +130,7 @@ def main_function():
                 self_play(sess, agent, env, train_data)
 
             print("Starting training...")
-			t1 = time.time()
+            t1 = time.time()
             for e in range(num_train_epochs):
                 diff_frames, actions, wins = train_data.sample(train_batch_size)
                 loss = agent.train(sess, diff_frames, actions, wins)
