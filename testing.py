@@ -82,7 +82,7 @@ def main_function():
 			for n in range(num_self_play_games):
 				if n%100 == 0:
 					print("Self-play game: %s" %n)
-			  	self_play(sess, agent, env, train_data)
+				self_play(sess, agent, env, train_data)
 
 			print("Starting training...")
 			for e in range(num_train_epochs):
