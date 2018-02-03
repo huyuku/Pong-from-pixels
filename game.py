@@ -4,6 +4,7 @@ This module is used to generate data by having the agent play pong.
 
 import agents
 import gym
+import cProfile
 
 #define preprocessing functions.
 def preprocess(frame):
