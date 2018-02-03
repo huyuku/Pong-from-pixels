@@ -25,7 +25,6 @@ def diff_frame(ordered_frames):
 	'''compares frames from the current and last timestep, in order to be able to capture motion'''
 	return preprocess(ordered_frames[0] - ordered_frames[1])
 
-<<<<<<< HEAD:testing.py
 #HYPERPARAMETERS AND SETTINGS
 num_self_play_games = 50000
 num_train_epochs = 100 #Change to something plausible later
@@ -36,7 +35,6 @@ hidden_size = 100
 without_net = False
 quick_self_play = True #For testing
 =======
->>>>>>> be8bdcc9b00d02737b64c67e1217f666a0ec0f2b:game.py
 
 debug = False
 displaying_analytics = False
@@ -101,7 +99,6 @@ def self_play(session, agent, env, train_data):
     env.render(close=True)
     return OpenAI_bot_score, agent_score
 
-<<<<<<< HEAD:testing.py
 
 #define preprocessing functions
 def preprocess(frame):
@@ -145,5 +142,3 @@ def main_function():
                 print("Loss epoch %s: %s" % (e, loss))
 
 cProfile.run('main_function()')
-=======
->>>>>>> be8bdcc9b00d02737b64c67e1217f666a0ec0f2b:game.py
