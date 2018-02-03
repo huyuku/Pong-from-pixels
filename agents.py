@@ -10,7 +10,7 @@ class BasicAgent():
     learning_rate controls the learning rate of the gradient descent optimiser.
     
     '''
-    def __init__(self, hidden_size, learning_rate):
+    def __init__(self, hidden_size=100, learning_rate):
 
         def weight_variable(shape):
             initial = tf.truncated_normal(shape, stddev=0.05)
