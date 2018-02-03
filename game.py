@@ -7,6 +7,7 @@ import numpy as np
 import agents
 import gym
 import cProfile
+import time
 from config import *
 
 #define preprocessing functions.
