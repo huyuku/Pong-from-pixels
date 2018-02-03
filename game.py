@@ -118,14 +118,14 @@ def main_function():
             train_data = train_set()
 
             print("Starting self-play...")
-			t1 = time.time()
+            t1 = time.time()
             for n in range(num_self_play_games):
                 if n%100 == 0:
-					t2 = time.time()
+                    t2 = time.time()
                     print("Self-play game: %s" %n)
-					if print_analytics:
-						print("Self-play time: " + str(t2-t1) + " seconds.")
-						t1 = time.time()
+                    if print_analytics:
+                        print("Self-play time: " + str(t2-t1) + " seconds.")
+                        t1 = time.time()
                 self_play(sess, agent, env, train_data)
 
             print("Starting training...")
