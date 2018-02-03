@@ -11,11 +11,6 @@ import time
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
-if print_analytics:
-	cProfile.run('main_function()') #Probably not very helpful
-else:
-	main_function()
-
 def main_function():
 	with tf.Session() as sess:
 		sess.run(tf.global_variables_initializer())
@@ -44,6 +39,13 @@ def main_function():
 				diff_frames, actions, wins = train_data.sample(train_batch_size)
 				loss = agent.train(sess, diff_frames, actions, wins)
 				print("Loss epoch %s: %s" % (e, loss))
+<<<<<<< HEAD
 				t2 = time.time()
 				if print_analytics:
 					print("Time: " + str(t1-t2) + " seconds.")
+=======
+if print_analytics:
+	cProfile.run('main_function()') #Probably not very helpful
+else:
+	main_function()
+>>>>>>> b294f0e5155a3e8caa286185bace17132811a4b7
