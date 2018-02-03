@@ -22,16 +22,14 @@ def main_function():
 			print("Starting self-play...")
 
 			t1 = time.time()
-
 			for n in range(num_self_play_games):
 				if n%100 == 0:
 					print("Self-play game: %s" %n)
-
+					t2 = time.time()
+					if print_analytics:
+						print("Self-play time: " + str(t2-t1) + " seconds.")
+					t1 = t2
 				self_play(sess, agent, env, train_data)
-
-			t2 = time.time()
-			if print_analytics:
-				print("Time: " + str(t1-t2) + " seconds.")
 
 			print("Starting training...")
 			for e in range(num_train_epochs):
@@ -41,4 +39,4 @@ def main_function():
 				print("Loss epoch %s: %s" % (e, loss))
 				t2 = time.time()
 				if print_analytics:
-					print("Time: " + str(t1-t2) + " seconds.")
+					print("Train epoch time: " + str(t2-t1) + " seconds.")

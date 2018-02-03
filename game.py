@@ -115,16 +115,26 @@ def main_function():
             train_data = train_set()
 
             print("Starting self-play...")
+			t1 = time.time()
             for n in range(num_self_play_games):
                 if n%100 == 0:
+					t2 = time.time()
                     print("Self-play game: %s" %n)
+					if print_analytics:
+						print("Self-play time: " + str(t2-t1) + " seconds.")
+						t1 = time.time()
                 self_play(sess, agent, env, train_data)
 
             print("Starting training...")
+			t1 = time.time()
             for e in range(num_train_epochs):
                 diff_frames, actions, wins = train_data.sample(train_batch_size)
                 loss = agent.train(sess, diff_frames, actions, wins)
                 print("Loss epoch %s: %s" % (e, loss))
+				t2 = time.time()
+				if print_analytics:
+					print("Train epoch time: " + str(t2-t1) + " seconds.")
+				t1 = t2
 
 if print_analytics:
 	cProfile.run('main_function()') #Probably not very helpful
