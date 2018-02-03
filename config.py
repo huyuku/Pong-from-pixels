@@ -1,5 +1,5 @@
 #HYPERPARAMETERS AND SETTINGS
-num_self_play_games = 100
+num_self_play_games = 10
 num_train_epochs = 50 #Change to something plausible later
 train_batch_size = 100
 num_iterations = 10
