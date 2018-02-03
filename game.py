@@ -1,7 +1,9 @@
 '''
 This module is used to generate data by having the agent play pong.
 '''
-
+import tensorflow as tf
+import random
+import numpy as np
 import agents
 import gym
 import cProfile
@@ -60,13 +62,13 @@ def self_play(session, agent, env, train_data):
         if without_net:
             a = env.action_space.sample()
         else:
-            a = agent.action(session, ex(diff_frame(s)))
+            a = agent.gym_action(session, ex(diff_frame(frame_buffer)))
         #Update the short term memory
         frame_buffer[0]=frame_buffer[1]
-        frame_buffer[1], r, done, i = env.step(a+3) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
+        frame_buffer[1], r, done, i = env.step(a) #Converting between a binary action representation, used in the loss function, and the gym representation (3-4)
         #Add the state action pair (s, a) to the temporary history, later to be added to the
         #main train data object once we have a reward r, which gives the complete data-point (s, a, r)
-        temp_history.extend([[diff_frame(frame_buffer), a]])
+        temp_history.extend([[diff_frame(frame_buffer), a-3]])
         if abs(r) == 1:
 			# Update the scores
             if r == 1:
