@@ -3,18 +3,14 @@ import numpy as np
 import random
 import gym
 import numpy as np
-import cProfile
-env = gym.make('Pong-v0')
-#import sklearn as sk
-
-#TESTEDIT JOAR
 
 #HYPERPARAMETERS
 num_self_play_games = 50000
 num_train_epochs = 100 #Change to something plausible later
 train_batch_size = 20
 num_iterations = 1
-
+learning_rate = 0.01
+hidden_size_1 = 100000
 
 class train_set(): 
     '''Storing self-play games for training'''
@@ -34,7 +30,7 @@ class train_set():
         a = np.stack([self.history[:][idx][1] for idx in idxes], 0)
         r = np.expand_dims(np.stack([self.history[:][idx][2] for idx in idxes], 0), 1)
         return s, a, r
-     
+    
     
 def self_play(session, agent, env, train_data):
     env.reset()
@@ -56,10 +52,6 @@ def self_play(session, agent, env, train_data):
     for entry in temp_history:
         train_data.add(entry[0], entry[1], r)
     env.render(close=True)
-
-#variable initialisations
-learning_rate = 0.01
-hidden_size_1 = 100000
 
 #define preprocessing functions
 def preprocess(frame):
@@ -114,30 +106,26 @@ class BasicAgent():
         _, loss = sess.run([self.GD.self.minimize(self.loss), self.loss], feed_dict=feed_dict)
         return loss
 
-    
-
 agent = BasicAgent()
-                     
-cProfile.run(mainfunction())
-
-def mainfunction():
-	with tf.Session() as sess:	
-	    sess.run(tf.global_variables_initializer()) 
-	    for i in range(num_iterations):
-		print("Iteration %s. Resetting dataset" % i)
-		train_data = train_set()
-
-		print("Starting self-play...")
-		for n in range(num_self_play_games):
-		  if n%100 == 0:
-		    print("Self-play game: %s" %n)
-
-		  self_play(sess, agent, env, train_data)
-		print("Starting training...")
-		for e in range(num_train_epochs):
-		  diff_frames, actions, wins = train_data.sample(train_batch_size)
-		  loss = agent.train(sess, diff_frames, actions, wins)
-		  print("Loss epoch %s: %s" % (e, loss))
-
+env = gym.make('Pong-v0')
+                               
+with tf.Session() as sess:	
+    sess.run(tf.global_variables_initializer()) 
+    for i in range(num_iterations):
+        print("Iteration %s. Resetting dataset" % i)
+        train_data = train_set()
+    
+        print("Starting self-play...")
+        for n in range(num_self_play_games):
+          if n%100 == 0:
+            print("Self-play game: %s" %n)
+    
+          self_play(sess, agent, env, train_data)
+        print("Starting training...")
+        for e in range(num_train_epochs):
+          diff_frames, actions, wins = train_data.sample(train_batch_size)
+          loss = agent.train(sess, diff_frames, actions, wins)
+          print("Loss epoch %s: %s" % (e, loss))
+                               
                                
  
