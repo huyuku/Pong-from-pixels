@@ -3,16 +3,21 @@ import numpy as np
 
 class BasicAgent():
     '''
-    This agent uses a 1-hidden-layer dense NN to compute probability of going UP.
+    Uses a 1-hidden-layer dense NN to compute probability of going UP,
+    then samples using that probability to decide its action.
 
-    arguments:
+    * arguments:
 
     hidden_size, default=100
         controls the number of nodes in the hidden layer.
 
     learning_rate, default=0.01
-        controls the learning rate of the gradient descent optimiser.
-    
+        controls the learning rate of the optimiser used for training.
+
+    * comments:
+
+    uses tf.AdamOptimiser for its training step.
+
     '''
     def __init__(self, hidden_size=100, learning_rate=0.01):
 
@@ -33,7 +38,7 @@ class BasicAgent():
         # loss = - sum over i of reward_i * p(action_i | frame_i)
         self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)))
 
-        self.GD = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+        self.GD = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
