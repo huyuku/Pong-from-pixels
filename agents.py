@@ -3,6 +3,17 @@ import numpy as np
 from config import *
 import time
 
+# Copies one set of variables to another.
+# Used to set worker network parameters to those of global network.
+def update_target_graph(from_scope,to_scope):
+    from_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, from_scope)
+    to_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, to_scope)
+
+    op_holder = []
+    for from_var,to_var in zip(from_vars,to_vars):
+        op_holder.append(to_var.assign(from_var))
+    return op_holder
+
 class BasicAgent():
     '''
     Uses a 1-hidden-layer dense NN to compute probability of going UP,
@@ -57,10 +68,10 @@ class BasicAgent():
     def gym_action(self, sess, diff_frame):
         return 3 + self.action(sess, diff_frame)
 
-    def train(self, sess, diff_frames, actions, wins):
+    def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
         t1 = time.time()
-        feed_dict={self.input_vector:diff_frames, self.actions:actions, self.rewards:wins}
+        feed_dict={self.input_vector:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.GD.self.minimize(self.loss), self.loss], feed_dict=feed_dict)
         t2 = time.time()
         if print_analytics:
