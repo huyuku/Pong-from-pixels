@@ -73,17 +73,17 @@ def self_play(session, agent, env, train_data):
         #main train data object once we have a reward r, which gives the complete data-point (s, a, r)
         temp_history.extend([[diff_frame(frame_buffer), a-3]])
         if abs(r) == 1:
-			# Update the score
-			if r == 1:
-				agent_score += 1
-			else:
-				OpenAI_bot_score += 1
-			for entry in temp_history: #Update main train data-set
-				train_data.add(entry[0], entry[1], r)
-			if quick_self_play: #Whether to play first to 20 wins or just first to 1
-				done = True
-			else:
-				temp_history = []
+            # Update the score
+            if r == 1:
+                agent_score += 1
+            else:
+                OpenAI_bot_score += 1
+            for entry in temp_history: #Update main train data-set
+                train_data.add(entry[0], entry[1], r)
+            if quick_self_play: #Whether to play first to 20 wins or just first to 1
+                done = True
+            else:
+                temp_history = []
         t2 = time.time()
 
     #env.render(close=True)
