@@ -20,7 +20,6 @@ quick_self_play = True #For testing
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 
-cProfile.run('main_function()')
 
 def main_function():
 	with tf.Session() as sess:
