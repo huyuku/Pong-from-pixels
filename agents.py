@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from config import *
+import time
 
 class BasicAgent():
     '''
@@ -43,9 +44,14 @@ class BasicAgent():
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
+        t1 = time.time()
         feed_dict = {self.input_vectors:diff_frame}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
-        action = 3 + np.random.binomial(1, predicted_action)
+        action = np.random.binomial(1, predicted_action)
+        t2 = time.time()
+        if print_analytics:
+            if (t2-t1) > 1:
+                print("Agent took " + str(t2-t1) + " seconds to generate action!")
         return action
 
     def gym_action(self, sess, diff_frame):
@@ -53,6 +59,11 @@ class BasicAgent():
 
     def train(self, sess, diff_frames, actions, wins):
         '''trains the agent on the data'''
+        t1 = time.time()
         feed_dict={self.input_vector:diff_frames, self.actions:actions, self.rewards:wins}
         _, loss = sess.run([self.GD.self.minimize(self.loss), self.loss], feed_dict=feed_dict)
+        t2 = time.time()
+        if print_analytics:
+            if (t2-t1) > 1:
+                print("Agent took " + str(t2-t1) + " seconds to train")
         return loss

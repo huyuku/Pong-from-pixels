@@ -85,10 +85,16 @@ def self_play(session, agent, env, train_data):
                     train_data.add(entry[0], entry[1], r)
 
                 temp_history = []
+
         t2 = time.time()
         if print_analytics:
-            print(t2)
-
+            t_diff = int(t2-t1)
+            if t_diff > 100:
+                print("Self-play loop has run for 100 seconds!")
+            elif t_diff > 10:
+                print("Self-play loop has run for 10 seconds.")
+            elif t_diff > 1:
+                print("Self-play loop has run for one seconds.")
 
     env.render(close=True)
     return OpenAI_bot_score, agent_score
