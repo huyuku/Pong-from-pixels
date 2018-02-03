@@ -52,7 +52,7 @@ class BasicAgent():
         # loss = - sum over i of reward_i * p(action_i | frame_i)
         self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)))
 
-        self.GD = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
@@ -73,7 +73,7 @@ class BasicAgent():
         '''trains the agent on the data'''
         t1 = time.time()
         feed_dict={self.input_vectors:diff_frames, self.actions:actions, self.rewards:rewards}
-        _, loss = sess.run([self.GD.self.minimize(self.loss), self.loss], feed_dict=feed_dict)
+        _, loss = sess.run([self.Optimizer.minimize(self.loss), self.loss], feed_dict=feed_dict)
         t2 = time.time()
         if print_analytics:
             if (t2-t1) > 1:
