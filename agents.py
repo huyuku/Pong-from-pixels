@@ -73,7 +73,7 @@ class BasicAgent():
         '''trains the agent on the data'''
         t1 = time.time()
         feed_dict={self.input_vectors:diff_frames, self.actions:actions, self.rewards:rewards}
-        _, loss = sess.run([self.GD.self.minimize(self.loss), self.loss], feed_dict=feed_dict)
+        _, loss = sess.run([self.GD.minimize(self.loss), self.loss], feed_dict=feed_dict)
         t2 = time.time()
         if print_analytics:
             if (t2-t1) > 1:
