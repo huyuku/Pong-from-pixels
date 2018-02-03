@@ -137,12 +137,12 @@ def main_function():
                 diff_frames, actions, wins = train_data.sample(train_batch_size)
                 loss = agent.train(sess, diff_frames, actions, wins)
                 print("Loss epoch %s: %s" % (e, loss))
-				t2 = time.time()
-				if print_analytics:
-					print("Train epoch time: " + str(t2-t1) + " seconds.")
-				t1 = t2
+                t2 = time.time()
+                if print_analytics:
+                    print("Train epoch time: " + str(t2-t1) + " seconds.")
+                t1 = t2
 
 if print_analytics:
-	cProfile.run('main_function()') #Probably not very helpful
+    cProfile.run('main_function()') #Probably not very helpful
 else:
-	main_function()
+    main_function()
