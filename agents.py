@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from config import *
 import time
+import logging
 
 # Copies one set of variables to another.
 # Used to set worker network parameters to those of global network.

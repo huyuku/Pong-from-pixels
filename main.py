@@ -7,6 +7,7 @@ import agents
 import game
 from config import *
 import time
+import logging
 
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')

@@ -9,6 +9,7 @@ import gym
 import cProfile
 import time
 from config import *
+import logging
 
 #define preprocessing functions.
 def preprocess(frame):
@@ -127,7 +128,7 @@ def main_function():
             print("Starting self-play...")
             t1 = time.time()
             for n in range(num_self_play_games):
-                if n%100 == 0:
+                if n%10 == 0:
                     t2 = time.time()
                     print("Self-play game: %s" %n)
                     print("Current score: %s wins, %s losses." % (wins, losses))
