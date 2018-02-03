@@ -15,8 +15,10 @@ def preprocess(frame):
 	frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
 	return frame.astype(np.float).ravel()
 
+	return frame.astype(np.float).ravel()
+
 def ex(preprocessed_frames):
-	'''expand array along first dimension, used if running the network with batch_size=1'''
+    '''expand array along first dimension, used if running the network with batch_size=1'''
     return np.expand_dims(preprocessed_frames,0)
 
 def diff_frame(ordered_frames):
@@ -83,7 +85,7 @@ def self_play(session, agent, env, train_data):
         temp_history.extend([[diff_frame(frame_buffer), a]])
         if abs(r) == 1:
 			# Update the scores
-			if r == 1:
+            if r == 1:
                 agent_score += 1
             else:
                 OpenAI_bot_score += 1
@@ -98,6 +100,7 @@ def self_play(session, agent, env, train_data):
 
     env.render(close=True)
     return OpenAI_bot_score, agent_score
+
 <<<<<<< HEAD:testing.py
 
 #define preprocessing functions
