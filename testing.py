@@ -4,6 +4,7 @@ import random
 import gym
 import numpy as np
 import cProfile
+import agents
 
 #HYPERPARAMETERS
 num_self_play_games = 50000
