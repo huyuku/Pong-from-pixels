@@ -1,6 +1,7 @@
 from config import *
 import time
 import logging
+import numpy as np
 #import tensorflow as tf
 
 class Logger():
@@ -30,11 +31,11 @@ class Logger():
         #tf.Print(matrix)
         self.loginfo('Matrix '+name+':')
         self.loginfo('')
-        self.loginfo(numpy.array_str(matrix))
+        self.loginfo(np.array_str(matrix))
         self.loginfo('')
         if print_analytics:
             print('Matrix '+name+':\n')
-            print(numpy.array_str(matrix)+'\n')
+            print(np.array_str(matrix)+'\n')
 
     #def print_matrix(self, matrix, mat_height, mat_width)
         #fig = plt.figure()
