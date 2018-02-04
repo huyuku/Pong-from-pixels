@@ -34,31 +34,37 @@ class BasicAgent():
     '''
     def __init__(self, hidden_size=100, learning_rate=0.01):
 
-        def weight_variable(shape):
+        def weight_variable(shape, name):
             initial = tf.truncated_normal(shape, stddev=0.05)
-            return tf.Variable(initial)
+            return tf.Variable(initial, name=name)
 
-        self.W1 = weight_variable([80*80, hidden_size])
-        self.W2 = weight_variable([hidden_size, 1])
+        self.W1 = weight_variable([80*80, hidden_size], "W1")
+        self.W2 = weight_variable([hidden_size, 1], "W2")
 
-        self.input_vectors = tf.placeholder(shape=(None, 80*80), dtype=tf.float32)  # flattened diff_frame
-        self.actions       = tf.placeholder(shape=(None, 1),     dtype=tf.float32)  # 1 if agent went UP, 0 otherwise
-        self.rewards       = tf.placeholder(shape=(None, 1),     dtype=tf.float32)  # 1 if frame comes from a won game, -1 otherwise
+        self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
+        self.actions = tf.placeholder(shape=(None,),     dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
+        self.rewards = tf.placeholder(shape=(None,),     dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
 
-        self.hidden_layer = tf.nn.relu(tf.matmul(self.input_vectors, self.W1))
-        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2))
+        self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
+        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
         # loss = - sum over i of reward_i * p(action_i | frame_i)
-        self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)))
+        self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)), name="loss")
 
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        self.train_step = self.Optimizer.minimize(self.loss)
 
         self.logger = debugtools.Logger()
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
+<<<<<<< HEAD
         self.logger.set_time_start()
         feed_dict = {self.input_vectors:diff_frame}
+=======
+        self.logger.settimestart()
+        feed_dict = {self.frames:diff_frame}
+>>>>>>> db8d640c08ac5d06b443b5ec1ec6bd80692eb04b
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
         self.logger.logtime('Action generation', 1)
@@ -70,8 +76,8 @@ class BasicAgent():
     def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
         #self.timer.setstart()
-        feed_dict={self.input_vectors:diff_frames, self.actions:actions, self.rewards:rewards}
-        _, loss = sess.run([self.Optimizer.minimize(self.loss), self.loss], feed_dict=feed_dict)
+        feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
+        _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
         #self.timer.logtime('Training', 1)
         return loss
 
