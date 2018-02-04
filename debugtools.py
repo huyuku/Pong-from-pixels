@@ -9,7 +9,7 @@ class Logger():
         self.t1 = time.time()
         self.t2 = 0
 
-    def set_time_start():
+    def set_time_start(self):
         self.t1 = time.time()
         self.t2 = 0
 

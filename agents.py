@@ -58,13 +58,8 @@ class BasicAgent():
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
-<<<<<<< HEAD
         self.logger.set_time_start()
         feed_dict = {self.input_vectors:diff_frame}
-=======
-        self.logger.settimestart()
-        feed_dict = {self.frames:diff_frame}
->>>>>>> db8d640c08ac5d06b443b5ec1ec6bd80692eb04b
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
         self.logger.logtime('Action generation', 1)
