@@ -19,11 +19,11 @@ def main_function():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         dataset = data.Dataset()
-        wins = 0
-        losses = 0
-        scored = 0
         agent.set_time_start()
         for i in range(NUM_ITERATIONS):
+            wins = 0
+            losses = 0
+            scored = 0
             dataset.reset()
             print("Iteration {0}".format(i+1))
             print("Playing games...")
@@ -46,7 +46,6 @@ def main_function():
                 loss = agent.train(sess,f,a,r)
                 print(" {0} epochs trained. Loss on last epoch: {1:.2f}".format(epoch+1, loss), end='\r')
             print()
-
 
 if __name__ == "__main__":
     main_function()
