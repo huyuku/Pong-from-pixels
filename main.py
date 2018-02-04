@@ -48,6 +48,7 @@ def main_function():
         sess.run(tf.global_variables_initializer())
         dataset = data.Dataset()
         for i in range(NUM_ITERATIONS):
+            dataset.reset()
             print("Iteration {0}".format(i+1))
             print("Playing games:")
             for i_game in range(GAMES_PER_ITER):
@@ -55,6 +56,7 @@ def main_function():
                 dataset.add(f,a,r)
                 if i_game % 20 == 0:
                     print("Game {0}. Agent: {1}, Opponent: {2}".format(i_game, a_s, o_s))
+            print("Size of dataset: {0}".format(dataset.size))
             print("Training:")
             for epoch in range(EPOCHS_PER_ITER):
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
