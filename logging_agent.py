@@ -23,7 +23,7 @@ class Logging_Agent():
         return loss
 
     def set_time_start(self):
-        self.logger.set_time_start():
+        self.logger.set_time_start()
 
     def playing_log(self, number_of_games, wins, losses):
         logger.loginfo("%s games, score: %s wins, %s losses" % (number_of_games, wins, losses))
