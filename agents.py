@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from config import *
 import debugtools
 
 # Copies one set of variables to another.
