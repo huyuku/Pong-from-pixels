@@ -6,6 +6,6 @@ num_iterations = 10
 learning_rate = 0.01
 hidden_size = 100
 without_net = False
-quick_self_play = bool(int(input("Quick self-play? 0 for no and 1 for yes"))) #For testing
+quick_self_play = bool(int(input("Quick self-play? 0 for no and 1 for yes\n"))) #For testing
 debug = False
 print_analytics = True
