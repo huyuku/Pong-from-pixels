@@ -10,6 +10,8 @@ from config import *
 import time
 import logging
 
+#testing atom!
+
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)

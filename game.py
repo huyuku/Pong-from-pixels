@@ -88,3 +88,67 @@ def self_play(session, agent, env, train_data):
 
     #env.render(close=True)
     return OpenAI_bot_score, agent_score
+
+def create_play_data(session, agent, env, without_net=False):
+	"""
+	Generates data of the agent playing against the built-in pong AI.
+
+	* returns:
+		diff_frames, actions, rewards, opponent_score, agent_score
+
+		diff_frames: a 6400x1 vector representing difference frames at each t.
+		actions: The action taken at t. 1 if UP, 0 if down.
+		rewards: 1 if t leads up to a goal, -1 otherwise.
+		opponent_score, agent_score: number of goals scored in the episode.
+
+	"""
+    env.reset()
+	done = False
+
+	diff_frame_sets = []
+	action_sets = []
+	reward_sets = []
+
+    opponent_score = 0
+    agent_score = 0
+	diff_frames  = []
+	actions = []
+
+	current_frame = 0
+    current_action = env.action_space.sample() #take a random action to start with
+    while not done:
+		#make observation
+		last_frame = current_frame
+		f, r, done, i = env.step(current_action)
+		current_frame = preprocess(f)
+		diff_frame = current_frame - last_frame
+		diff_frames.append(diff_frame)
+		#take action
+        if without_net:
+            current_action = env.action_space.sample()
+        else:
+			current_action = agent.action(session, diff_frame)
+        actions.append(current_action - 3) # -3 needed to convert from gym representation to agent's representation
+
+        if abs(r) == 1: #a goal is scored
+            if r == 1:
+                agent_score += 1
+            else:
+                opponent_score += 1
+
+            if quick_self_play:
+                done = True
+
+			#package up the data for the frames involved in this goal
+			diff_frame_sets.append(np.stack(diff_frames, axis=0))
+			action_sets.append(np.stack(actions, axis=0))
+			reward_sets.append(r * np.ones(len(actions)))
+			diff_frames  = []
+			actions = []
+
+	#unpack data for each goal and combine into full sets
+	diff_frames_out = np.stack(frame_sets, axis=0)
+	actions_out = np.concatenate(action_sets, axis=0)
+	rewards_out = np.concatenate(reward_sets, axis=0)
+
+    return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
