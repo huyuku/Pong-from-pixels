@@ -79,8 +79,3 @@ class BasicAgent():
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
         #self.timer.logtime('Training', 1)
         return loss
-
-    def log_matrices(sess):
-        printer = debugtools.Logger()
-        printer.log_matrix('W1', sess.run(self.W1))
-        printer.log_matrix('W2', sess.run(self.W2))

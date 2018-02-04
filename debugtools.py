@@ -13,7 +13,7 @@ class Logger():
         self.t1 = time.time()
         self.t2 = 0
 
-    def logtime(process_name, limit=0):
+    def logtime(self, process_name, limit=0):
         self.t2 = time.time()
         if (t2-t1)>limit:
             logging.info(process_name + " took %s seconds to complete." % (t2-t1))
@@ -21,19 +21,22 @@ class Logger():
                 print(process_name + " took %s seconds to complete." % (t2-t1))
         self.t1 = t2
 
-    def loginfo(string):
+    def loginfo(self, string):
         logging.info(string)
         if print_analytics:
             print(string)
 
-    def log_matrix(name, matrix):
+    def log_matrix(self, name, matrix):
         #tf.Print(matrix)
-        loginfo('Matrix '+name+ ':')
-        loginfo('')
-        loginfo(numpy.array_str(matrix))
-        loginfo('')
+        self.loginfo('Matrix '+name+':')
+        self.loginfo('')
+        self.loginfo(numpy.array_str(matrix))
+        self.loginfo('')
+        if print_analytics:
+            print('Matrix '+name+':\n')
+            print(numpy.array_str(matrix)+'\n')
 
-    #def print_matrix(matrix, mat_height, mat_width)
+    #def print_matrix(self, matrix, mat_height, mat_width)
         #fig = plt.figure()
         #ax = fig2.add_subplot(mat_height, mat_width)
         #ax.set_xticks(())
