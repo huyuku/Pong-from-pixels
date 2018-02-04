@@ -57,7 +57,7 @@ class BasicAgent():
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
-        self.logger.settimestart()
+        self.logger.set_time_start()
         feed_dict = {self.input_vectors:diff_frame}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
@@ -74,3 +74,8 @@ class BasicAgent():
         _, loss = sess.run([self.Optimizer.minimize(self.loss), self.loss], feed_dict=feed_dict)
         #self.timer.logtime('Training', 1)
         return loss
+
+    def log_matrices(sess):
+        printer = debugtools.Logger()
+        printer.log_matrix('W1', sess.run(self.W1))
+        printer.log_matrix('W2', sess.run(self.W2))

@@ -1,6 +1,7 @@
 from config import *
 import time
 import logging
+#import tensorflow as tf
 
 class Logger():
 
@@ -8,7 +9,7 @@ class Logger():
         self.t1 = time.time()
         self.t2 = 0
 
-    def settimestart():
+    def set_time_start():
         self.t1 = time.time()
         self.t2 = 0
 
@@ -24,3 +25,17 @@ class Logger():
         logging.info(string)
         if print_analytics:
             print(string)
+
+    def log_matrix(name, matrix):
+        #tf.Print(matrix)
+        loginfo('Matrix '+name+ ':')
+        loginfo('')
+        loginfo(numpy.array_str(matrix))
+        loginfo('')
+
+    #def print_matrix(matrix, mat_height, mat_width)
+        #fig = plt.figure()
+        #ax = fig2.add_subplot(mat_height, mat_width)
+        #ax.set_xticks(())
+        #ax.set_yticks(())
+        #ax.imshow(matrix.reshape(mat_height, mat_width), cmap='Greys_r')

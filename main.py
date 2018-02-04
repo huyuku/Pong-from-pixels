@@ -23,7 +23,7 @@ def main_function():
             train_data = game.train_set()
 
             print("Starting self-play...")
-            timer.setstart()
+            timer.set_time_start()
             for n in range(num_self_play_games):
                 if n%10 == 0:
                     print("Self-play game: %s" %n)
@@ -36,7 +36,7 @@ def main_function():
                     losses += 1
 
             print("Starting training...")
-            timer.setstart()
+            timer.set_time_start()
             for e in range(num_train_epochs):
                 diff_frames, actions, wins = train_data.sample(train_batch_size)
                 loss = agent.train(sess, diff_frames, actions, wins)
