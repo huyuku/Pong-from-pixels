@@ -10,7 +10,6 @@ import gym
 from config import *
 import debugtools
 
-
 #define preprocessing functions.
 def preprocess(frame):
 	""" preprocess 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
@@ -102,7 +101,7 @@ def create_play_data(session, agent, env, without_net=False):
 	"""
 	env.reset()
 	done = False
-    timer = debugtools.timer()
+    logger = debugtools.Logger()
 
 	diff_frame_sets = []
 	action_sets = []
@@ -149,10 +148,5 @@ def create_play_data(session, agent, env, without_net=False):
 	diff_frames_out = np.stack(frame_sets, axis=0)
 	actions_out = np.concatenate(action_sets, axis=0)
 	rewards_out = np.concatenate(reward_sets, axis=0)
-<<<<<<< HEAD
-    timer.logtime('Play data creation')
+    logger.logtime('Play data creation')
     return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
-=======
-
-	return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
->>>>>>> 9f9659af54ce8daf5902bb2c252c7444f9e92dff

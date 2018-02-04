@@ -11,7 +11,7 @@ from config import *
 agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)
-timer = debugtools.timer()
+logger = debugtools.Logger()
 
 def main_function():
     wins = 0
@@ -27,8 +27,8 @@ def main_function():
             for n in range(num_self_play_games):
                 if n%10 == 0:
                     print("Self-play game: %s" %n)
-                    print("Current score: %s wins, %s losses." % (wins, losses))
-                    timer.logtime('10 self-play games')
+                    logger.loginfo("Score after %s games: %s wins, %s losses." % (n, wins, losses))
+                    logger.logtime('10 self-play games')
                 OpenAI_score, agent_score = game.self_play(sess, agent, env, train_data)
                 if agent_score>OpenAI_score:
                     wins += 1
@@ -40,7 +40,7 @@ def main_function():
             for e in range(num_train_epochs):
                 diff_frames, actions, wins = train_data.sample(train_batch_size)
                 loss = agent.train(sess, diff_frames, actions, wins)
-                print("Loss epoch %s: %s" % (e, loss))
-                timer.logtime('Train epoch')
+                logger.loginfo("Loss epoch %s loss: %s" % (e, loss))
+                logger.logtime('Train epoch')
 
 main_function()

@@ -53,15 +53,15 @@ class BasicAgent():
 
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
-        self.timer = debugtools.timer()
+        self.logger = debugtools.Logger()
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
-        self.timer.setstart()
+        self.logger.settimestart()
         feed_dict = {self.input_vectors:diff_frame}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
-        self.timer.logtime('Action generation', 1)
+        self.logger.logtime('Action generation', 1)
         return action
 
     def gym_action(self, sess, diff_frame):
