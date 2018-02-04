@@ -66,6 +66,8 @@ def main_function():
                 if i_game % 20 == 0:
                     agent.playing_log(i_game, wins, losses)
                     print("Game {0} score; Agent: {1}, Opponent: {2}".format(i_game, a_s, o_s))
+                    wins = 0
+                    losses = 0
             print("Size of dataset: {0}".format(dataset.size))
             print("Training:")
             for epoch in range(EPOCHS_PER_ITER):
