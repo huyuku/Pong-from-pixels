@@ -7,9 +7,9 @@ import numpy as np
 import agents
 import gym
 #import cProfile
-import time
 from config import *
-import logging
+import debugtools
+
 
 #define preprocessing functions.
 def preprocess(frame):
@@ -59,7 +59,6 @@ def self_play(session, agent, env, train_data):
         #env.render()
         frame_buffer[m], r, done, i = env.step(env.action_space.sample()) # take a random action
 
-    t1 = time.time()
     while not done:
         #env.render()
         if without_net:
@@ -84,7 +83,6 @@ def self_play(session, agent, env, train_data):
                 done = True
             else:
                 temp_history = []
-        t2 = time.time()
 
     #env.render(close=True)
     return OpenAI_bot_score, agent_score
@@ -104,6 +102,7 @@ def create_play_data(session, agent, env, without_net=False):
 	"""
     env.reset()
 	done = False
+    timer = debugtools.timer()
 
 	diff_frame_sets = []
 	action_sets = []
@@ -150,5 +149,5 @@ def create_play_data(session, agent, env, without_net=False):
 	diff_frames_out = np.stack(frame_sets, axis=0)
 	actions_out = np.concatenate(action_sets, axis=0)
 	rewards_out = np.concatenate(reward_sets, axis=0)
-
+    timer.logtime('Play data creation')
     return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
