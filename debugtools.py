@@ -22,7 +22,7 @@ class Logger():
                 print(process_name + " took %s seconds to complete." % (self.t2-self.t1))
         self.t1 = self.t2
 
-    def loginfo(self, string):
+    def loginfo(self, string, print_analytics=print_analytics):
         logging.info(string)
         if print_analytics:
             print(string)
@@ -31,7 +31,7 @@ class Logger():
         #tf.Print(matrix)
         self.loginfo('Matrix '+name+':')
         self.loginfo('')
-        self.loginfo(np.array_str(matrix))
+        self.loginfo(np.array_str(matrix), False)
         self.loginfo('')
         if print_analytics:
             print('Matrix '+name+':\n')
