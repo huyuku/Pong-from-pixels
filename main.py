@@ -6,7 +6,7 @@ import game
 import data
 import logging
 import logging_agent
-import debugtools
+from game import *
 from config import *
 
 agent = agents.BasicAgent(HIDDEN_SIZE, LEARNING_RATE)
@@ -14,6 +14,36 @@ agent = logging_agent.Logging_Agent(agent)
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)
 logger = debugtools.Logger()
+
+def old_main_function():
+    wins = 0
+    losses = 0
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        for i in range(num_iterations):
+            print("Iteration %s. Resetting dataset" % i)
+            train_data = game.train_set()
+
+            print("Starting self-play...")
+            timer.set_time_start()
+            for n in range(num_self_play_games):
+                if n%10 == 0:
+                    print("Self-play game: %s" %n)
+                    logger.loginfo("Score after %s games: %s wins, %s losses." % (n, wins, losses))
+                    logger.logtime('10 self-play games')
+                OpenAI_score, agent_score = game.self_play(sess, agent, env, train_data)
+                if agent_score>OpenAI_score:
+                    wins += 1
+                else:
+                    losses += 1
+
+            print("Starting training...")
+            timer.set_time_start()
+            for e in range(num_train_epochs):
+                diff_frames, actions, wins = train_data.sample(train_batch_size)
+                loss = agent.train(sess, diff_frames, actions, wins)
+                logger.loginfo("Loss epoch %s loss: %s" % (e, loss))
+                logger.logtime('Train epoch')
 
 def main_function():
     with tf.Session() as sess:
@@ -43,6 +73,9 @@ def main_function():
             for epoch in range(EPOCHS_PER_ITER):
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
                 loss = agent.train(sess,f,a,r)
+                #if epoch % 500 == 0:
+                    #agent.epoch_log(sess, epoch, loss)
+                    #print("Epoch {0}. Loss: {1}".format(epoch, loss))
 
 
 if __name__ == "__main__":
