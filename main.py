@@ -6,7 +6,7 @@ import game
 import data
 import logging
 import logging_agent
-import debugtools
+from game import *
 from config import *
 
 agent = agents.BasicAgent(HIDDEN_SIZE, LEARNING_RATE)

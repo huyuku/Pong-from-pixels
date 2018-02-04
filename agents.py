@@ -69,3 +69,6 @@ class BasicAgent():
         feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
         return loss
+
+    def set_time_start(self):
+        return
