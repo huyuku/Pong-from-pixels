@@ -37,14 +37,14 @@ def main_function():
                     losses += 1
                 if i_game % 20 == 0:
                     agent.playing_log(i_game, wins, losses)
-                print("{0} games played. Wins/Losses: {1}/{2}".format(i_game+1, wins, losses), end='\r')
+                print(" {0} games played. Wins/Losses: {1}/{2}".format(i_game+1, wins, losses), end='\r')
             print()
             print("Size of dataset: {0}".format(dataset.size))
             print("Training...")
             for epoch in range(EPOCHS_PER_ITER):
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
                 loss = agent.train(sess,f,a,r)
-                print("{0} epochs trained. Loss on last epoch: {1:.2f}".format(epoch+1, loss), end='\r')
+                print(" {0} epochs trained. Loss on last epoch: {1:.2f}".format(epoch+1, loss), end='\r')
             print()
 
 
