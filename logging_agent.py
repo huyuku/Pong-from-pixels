@@ -33,7 +33,7 @@ class Logging_Agent():
     def epoch_log(self, sess, epoch_number, loss):
         self.logger.loginfo("Epoch %s loss: %s" % (epoch_number, loss))
         self.logger.logtime('Epoch iteration')
-        self.logger.set_time_start()
+        #self.logger.set_time_start()
         #self.log_matrices(sess)
 
     def log_matrices(self, sess):
