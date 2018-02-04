@@ -48,9 +48,10 @@ def main_function():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for i in range(NUM_ITERATIONS):
-            f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET)
-            print("Game {0}. Agent score: {1}, Opponent score: {2}".format(i,a_s,o_s))
-            agent.train(sess,f,a,r)
+            f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
+            loss = agent.train(sess,f,a,r)
+            print("Game {0}. Agent score: {1}, Opponent score: {2}. Loss after training: {3}".format(i,a_s,o_s,loss))
+            
 
 if __name__ == "__main__":
     main_function()
