@@ -54,15 +54,11 @@ class BasicAgent():
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         self.train_step = self.Optimizer.minimize(self.loss)
 
-        self.logger = debugtools.Logger()
-
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
-        self.logger.set_time_start()
         feed_dict = {self.frames:diff_frame}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
-        self.logger.logtime('Action generation', 1)
         return action
 
     def gym_action(self, sess, diff_frame):
@@ -70,13 +66,6 @@ class BasicAgent():
 
     def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
-        #self.timer.setstart()
         feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
-        #self.timer.logtime('Training', 1)
         return loss
-
-    def log_matrices(sess):
-        printer = debugtools.Logger()
-        printer.log_matrix('W1', sess.run(self.W1))
-        printer.log_matrix('W2', sess.run(self.W2))
