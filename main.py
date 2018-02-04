@@ -61,7 +61,7 @@ def main_function():
             for epoch in range(EPOCHS_PER_ITER):
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
                 loss = agent.train(sess,f,a,r)
-                if epoch % 20 == 0:
+                if epoch % 500 == 0:
                     print("Epoch {0}. Loss: {1}".format(epoch, loss))
 
 
