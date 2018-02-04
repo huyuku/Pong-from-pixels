@@ -45,11 +45,11 @@ def old_main_function():
                 logger.logtime('Train epoch')
 
 def main_function():
-    with tf.Session as sess:
+    with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for i in range(num_iterations):
             f, a, r, o_s, a_s = game.create_play_data(sess, agent, env)
-            print("Game {0}. Agent score: {1}, Opponent_score: {2}".format(i,a_s,o_s))
+            print("Game {0}. Agent score: {1}, Opponent score: {2}".format(i,a_s,o_s))
             agent.train(sess,f,a,r)
 
 if __name__ == "__main__":
