@@ -109,7 +109,7 @@ def create_play_data(session, agent, env, without_net=False, quick_play=False):
 	"""
 	env.reset()
 	done = False
-    logger = debugtools.Logger()
+	logger = debugtools.Logger()
 
 	diff_frame_sets = []
 	action_sets = []
@@ -158,7 +158,7 @@ def create_play_data(session, agent, env, without_net=False, quick_play=False):
 	rewards_out = np.concatenate(reward_sets, axis=0)
 
 	logger.logtime('Play data creation')
-    return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
+	return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
 
 def test():
 	with tf.Session() as sess:
