@@ -67,6 +67,7 @@ def main_function():
                     agent.playing_log(i_game, wins, losses)
                     #print("Game {0}. Agent: {1}, Opponent: {2}".format(i_game, a_s, o_s))
             print("Size of dataset: {0}".format(dataset.size))
+            agent.set_time_start()
             print("Training:")
             for epoch in range(EPOCHS_PER_ITER):
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)

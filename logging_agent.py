@@ -17,9 +17,9 @@ class Logging_Agent():
         return self.agent.gym_action(sess, diff_frame)
 
     def train(self, sess, diff_frames, actions, rewards):
-        self.logger.set_time_start()
+        #self.logger.set_time_start()
         loss = self.agent.train(sess, diff_frames, actions, rewards)
-        self.logger.logtime('Training', 1)
+        #self.logger.logtime('Training', 1)
         return loss
 
     def set_time_start(self):
