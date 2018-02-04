@@ -6,6 +6,7 @@ class Logging_Agent():
     def __init__(self, agent):
         self.agent = agent
         self.logger = debugtools.Logger()
+        self.epochlogger = debugtools.Logger()
         self.taken_train_steps = 0 #not used atm
 
     def action(self, sess, diff_frame):
@@ -32,8 +33,8 @@ class Logging_Agent():
         self.logger.set_time_start()
 
     def epoch_log(self, sess, epoch_number, loss):
-        self.logger.loginfo("Epoch %s loss: %s" % (epoch_number, loss))
-        self.logger.logtime('Epoch iteration %s' % epoch_number)
+        self.epochlogger.loginfo("Epoch %s loss: %s" % (epoch_number, loss))
+        self.epochlogger.logtime('Epoch iteration %s' % epoch_number)
         #self.logger.set_time_start()
         #self.log_matrices(sess)
 
