@@ -102,21 +102,21 @@ def create_play_data(session, agent, env, without_net=False):
 		opponent_score, agent_score: number of goals scored in the episode.
 
 	"""
-    env.reset()
+	env.reset()
 	done = False
 
 	diff_frame_sets = []
 	action_sets = []
 	reward_sets = []
 
-    opponent_score = 0
-    agent_score = 0
+	opponent_score = 0
+	agent_score = 0
 	diff_frames  = []
 	actions = []
 
 	current_frame = 0
-    current_action = env.action_space.sample() #take a random action to start with
-    while not done:
+	current_action = env.action_space.sample() #take a random action to start with
+	while not done:
 		#make observation
 		last_frame = current_frame
 		f, r, done, i = env.step(current_action)
@@ -124,20 +124,20 @@ def create_play_data(session, agent, env, without_net=False):
 		diff_frame = current_frame - last_frame
 		diff_frames.append(diff_frame)
 		#take action
-        if without_net:
-            current_action = env.action_space.sample()
-        else:
+		if without_net:
+			current_action = env.action_space.sample()
+		else:
 			current_action = agent.action(session, diff_frame)
-        actions.append(current_action - 3) # -3 needed to convert from gym representation to agent's representation
+		actions.append(current_action - 3) # -3 needed to convert from gym representation to agent's representation
 
-        if abs(r) == 1: #a goal is scored
-            if r == 1:
-                agent_score += 1
-            else:
-                opponent_score += 1
+		if abs(r) == 1: #a goal is scored
+			if r == 1:
+				agent_score += 1
+			else:
+				opponent_score += 1
 
-            if quick_self_play:
-                done = True
+			if quick_self_play:
+				done = True
 
 			#package up the data for the frames involved in this goal
 			diff_frame_sets.append(np.stack(diff_frames, axis=0))
@@ -151,4 +151,4 @@ def create_play_data(session, agent, env, without_net=False):
 	actions_out = np.concatenate(action_sets, axis=0)
 	rewards_out = np.concatenate(reward_sets, axis=0)
 
-    return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
+	return diff_frames_out, actions_out, rewards_out, opponent_score, agent_score
