@@ -39,7 +39,7 @@ class Dataset():
 			self.actions = actions
 			self.rewards = rewards
 		else:
-			self.diff_frames = np.stack((self.diff_frames, diff_frames), axis=0)
+			self.diff_frames = np.concatenate((self.diff_frames, diff_frames), axis=0)
 			self.actions     = np.concatenate((self.actions, actions))
 			self.rewards     = np.concatenate((self.rewards, rewards))
 		self.size = self.size + h_frames
@@ -110,3 +110,8 @@ def progression_test():
 		print("progression test failed:")
 		print("t1: ", t1)
 		print("t2: ", t2)
+
+if __name__ == "__main__":
+	overflow_test()
+	inequality_test()
+	progression_test()

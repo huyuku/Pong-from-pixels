@@ -1,15 +1,14 @@
 import tensorflow as tf
 import numpy as np
-import random
 import gym
-#import cProfile
 import agents
 import game
+import data
 import logging
 from game import *
 from config import *
 
-agent = agents.BasicAgent(hidden_size, learning_rate)
+agent = agents.BasicAgent(HIDDEN_SIZE, LEARNING_RATE)
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)
 logger = debugtools.Logger()
@@ -47,11 +46,22 @@ def old_main_function():
 def main_function():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
+        dataset = data.Dataset()
         for i in range(NUM_ITERATIONS):
-            f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
-            loss = agent.train(sess,f,a,r)
-            print("Game {0}. Agent score: {1}, Opponent score: {2}. Loss after training: {3}".format(i,a_s,o_s,loss))
-            
+            print("Iteration {0}".format(i))
+            print("Playing games:")
+            for i_game in range(GAMES_PER_ITER):
+                f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
+                dataset.add(f,a,r)
+                if i_game % 20 == 0:
+                    print("Game {0}. Agent: {1}, Opponent: {2}".format(i_game, a_s, o_s))
+            print("Training:")
+            for epoch in range(EPOCHS_PER_ITER):
+                f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
+                loss = agent.train(sess,f,a,r)
+                if epoch % 20 == 0:
+                    print("Epoch {0}. Loss: {1}".format(epoch, loss))
+
 
 if __name__ == "__main__":
     main_function()
