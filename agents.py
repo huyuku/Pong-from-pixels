@@ -1,8 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from config import *
-import time
-import logging
+import debugtools
 
 # Copies one set of variables to another.
 # Used to set worker network parameters to those of global network.
@@ -55,16 +54,15 @@ class BasicAgent():
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         self.train_step = self.Optimizer.minimize(self.loss)
 
+        self.logger = debugtools.Logger()
+
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
-        t1 = time.time()
+        self.logger.settimestart()
         feed_dict = {self.frames:diff_frame}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
-        t2 = time.time()
-        if print_analytics:
-            if (t2-t1) > 1:
-                print("Agent took %s seconds to generate action!" % (t2-t1))
+        self.logger.logtime('Action generation', 1)
         return action
 
     def gym_action(self, sess, diff_frame):
@@ -72,11 +70,8 @@ class BasicAgent():
 
     def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
-        t1 = time.time()
+        #self.timer.setstart()
         feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
-        t2 = time.time()
-        if print_analytics:
-            if (t2-t1) > 1:
-                print("Agent took %s seconds to train!" % (t2-t1))
+        #self.timer.logtime('Training', 1)
         return loss
