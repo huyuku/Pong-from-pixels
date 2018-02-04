@@ -7,7 +7,7 @@ class Dataset():
 	* functions:
 
 	add(diff_frames, actions, rewards)
-		adds the rewards, actions, and frames arrays provided into the dataset.
+		adds the rewards, actions, and diff_frames arrays into the dataset.
 
 	reset()
 		removes all recorded data.
@@ -31,7 +31,7 @@ class Dataset():
 		h_frames, _= diff_frames.shape
 		h_actions = actions.size
 		h_rewards = rewards.size
-		assert h_frames == h_actions == h_rewards, "arguments to add() need to have equal height"
+		assert h_frames == h_actions == h_rewards, "arguments to Dataset.add() need to have equal height"
 
 		#add data into dataset
 		if self.size==0:
@@ -40,8 +40,8 @@ class Dataset():
 			self.rewards = rewards
 		else:
 			self.diff_frames = np.stack((self.diff_frames, diff_frames), axis=0)
-			self.actions     = np.stack((self.actions,     actions    ), axis=0)
-			self.rewards     = np.stack((self.rewards,     rewards    ), axis=0)
+			self.actions     = np.concatenate((self.actions, actions))
+			self.rewards     = np.concatenate((self.rewards, rewards))
 		self.size = self.size + h_frames
 
 	def reset(self):
