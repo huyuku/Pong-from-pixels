@@ -15,11 +15,11 @@ class Logger():
 
     def logtime(self, process_name, limit=0):
         self.t2 = time.time()
-        if (t2-t1)>limit:
-            logging.info(process_name + " took %s seconds to complete." % (t2-t1))
+        if (self.t2-self.t1)>limit:
+            logging.info(process_name + " took %s seconds to complete." % (self.t2-self.t1))
             if print_analytics:
-                print(process_name + " took %s seconds to complete." % (t2-t1))
-        self.t1 = t2
+                print(process_name + " took %s seconds to complete." % (self.t2-self.t1))
+        self.t1 = self.t2
 
     def loginfo(self, string):
         logging.info(string)
