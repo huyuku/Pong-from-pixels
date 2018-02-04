@@ -14,9 +14,6 @@ agent = agents.BasicAgent(hidden_size, learning_rate)
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)
 
-agent = agents.BasicAgent(hidden_size, learning_rate)
-env = gym.make('Pong-v0')
-
 def main_function():
     wins = 0
     losses = 0
