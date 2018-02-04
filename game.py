@@ -152,6 +152,8 @@ def create_play_data(session, agent, env, without_net=False, quick_play=False):
 			actions = []
 
 	#unpack data for each goal and combine into full sets
+#	print("just before concatenating:", np.size(diff_frame_sets), len(diff_frame_sets))
+#	print(diff_frame_sets)
 	diff_frames_out = np.concatenate(diff_frame_sets, axis=0)
 	actions_out = np.concatenate(action_sets, axis=0)
 	rewards_out = np.concatenate(reward_sets, axis=0)

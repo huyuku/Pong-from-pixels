@@ -31,27 +31,27 @@ class BasicAgent():
     uses tf.AdamOptimiser for its training step.
 
     '''
-    def __init__(self, hidden_size=100, learning_rate=0.01):
+    def __init__(self, scope, hidden_size=100, learning_rate=0.01):
+        with tf.variable_scope(scope):
+            def weight_variable(shape, name):
+                initial = tf.truncated_normal(shape, stddev=0.05)
+                return tf.Variable(initial, name=name)
 
-        def weight_variable(shape, name):
-            initial = tf.truncated_normal(shape, stddev=0.05)
-            return tf.Variable(initial, name=name)
+            self.W1 = weight_variable([80*80, hidden_size], "W1")
+            self.W2 = weight_variable([hidden_size, 1], "W2")
 
-        self.W1 = weight_variable([80*80, hidden_size], "W1")
-        self.W2 = weight_variable([hidden_size, 1], "W2")
+            self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
+            self.actions = tf.placeholder(shape=(None,),     dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
+            self.rewards = tf.placeholder(shape=(None,),     dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
 
-        self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
-        self.actions = tf.placeholder(shape=(None,),     dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
-        self.rewards = tf.placeholder(shape=(None,),     dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
+            self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
+            self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
-        self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
-        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
+            # loss = - sum over i of reward_i * p(action_i | frame_i)
+            self.loss = - tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)), name="loss")
 
-        # loss = - sum over i of reward_i * p(action_i | frame_i)
-        self.loss = - tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)), name="loss")
-
-        self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-        self.train_step = self.Optimizer.minimize(self.loss)
+            self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+            self.train_step = self.Optimizer.minimize(self.loss)
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
