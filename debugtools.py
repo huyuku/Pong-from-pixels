@@ -33,9 +33,6 @@ class Logger():
         self.loginfo('')
         self.loginfo(np.array_str(matrix), False)
         self.loginfo('')
-        if print_analytics:
-            print('Matrix '+name+':\n')
-            print(np.array_str(matrix)+'\n')
 
     #def print_matrix(self, matrix, mat_height, mat_width)
         #fig = plt.figure()
