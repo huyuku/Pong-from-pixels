@@ -48,7 +48,7 @@ class BasicAgent():
         self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
         # loss = - sum over i of reward_i * p(action_i | frame_i)
-        self.loss = tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)), name="loss")
+        self.loss = - tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)), name="loss")
 
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         self.train_step = self.Optimizer.minimize(self.loss)
