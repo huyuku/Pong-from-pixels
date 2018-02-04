@@ -26,13 +26,13 @@ class Logging_Agent():
         self.logger.set_time_start():
 
     def playing_log(self, number_of_games, wins, losses):
-        logger.loginfo("%s games, score: %s wins, %s losses" % (number_of_games, wins, losses))
-        logger.logtime('Playing iteration')
+        self.logger.loginfo("%s games, score: %s wins, %s losses" % (number_of_games, wins, losses))
+        self.logger.logtime('Playing iteration')
         self.logger.set_time_start()
 
     def epoch_log(self, sess, epoch_number, loss):
-        logger.loginfo("Epoch %s loss: %s" % (epoch_number, loss))
-        logger.logtime('Epoch iteration')
+        self.logger.loginfo("Epoch %s loss: %s" % (epoch_number, loss))
+        self.logger.logtime('Epoch iteration')
         self.logger.set_time_start()
         self.log_matrices(sess)
 
