@@ -24,6 +24,7 @@ class Logging_Agent():
         if self.taken_train_steps == 1:
             self.epochlogger.set_time_start()
         if self.taken_train_steps % 500 == 0:
+            self.logger.loginto(str(self.taken_train_steps))
             self.epoch_log(sess, 500, loss)
         return loss
 
