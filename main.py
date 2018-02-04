@@ -48,7 +48,7 @@ def main_function():
         sess.run(tf.global_variables_initializer())
         dataset = data.Dataset()
         for i in range(NUM_ITERATIONS):
-            print("Iteration {0}".format(i))
+            print("Iteration {0}".format(i+1))
             print("Playing games:")
             for i_game in range(GAMES_PER_ITER):
                 f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
