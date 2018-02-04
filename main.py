@@ -37,7 +37,7 @@ def main_function():
                     losses += 1
                 if i_game % 20 == 0:
                     agent.playing_log(i_game, wins, losses)
-                print(" {0} games played. Wins/Losses: {1}/{2}".format(i_game+1, wins, losses), end='\r')
+                print(" {0} games played. Wins/Losses: {1}/{2}. Goals scored: {3}".format(i_game+1, wins, losses, scored), end='\r')
             print()
             print("Size of dataset: {0}".format(dataset.size))
             print("Training...")
