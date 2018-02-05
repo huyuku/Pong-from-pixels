@@ -10,7 +10,7 @@ from game import *
 from config import *
 
 agent = agents.BasicAgent(HIDDEN_SIZE, LEARNING_RATE)
-agent = logging_agent.Logging_Agent(agent)
+#agent = logging_agent.Logging_Agent(agent)
 #game_object = logging_game.Game()
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)
@@ -20,7 +20,7 @@ def main_function():
 	with tf.Session() as sess:
 		sess.run(tf.global_variables_initializer())
 		dataset = data.Dataset()
-		agent.set_time_start()
+		#agent.set_time_start()
 		for i in range(NUM_ITERATIONS):
 			wins = 0
 			losses = 0
@@ -36,8 +36,8 @@ def main_function():
 					wins += 1
 				else:
 					losses += 1
-				if i_game % 20 == 0:
-					agent.playing_log(i_game, wins, losses)
+				#if i_game % 20 == 0:
+					#agent.playing_log(i_game, wins, losses)
 				print(" {0} games played. Wins/Losses: {1}/{2}. Goals scored: {3}".format(i_game+1, wins, losses, scored), end='\r')
 			print()
 			print("Size of dataset: {0}".format(dataset.size))
