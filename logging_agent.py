@@ -7,7 +7,7 @@ class Logging_Agent():
         self.agent = agent
         self.logger = debugtools.Logger()
         self.epochlogger = debugtools.Logger()
-        self.taken_train_steps = 0 #not used atm
+        self.taken_train_steps = 0
 
     def action(self, sess, diff_frame):
         #self.logger.set_time_start()
@@ -19,9 +19,13 @@ class Logging_Agent():
         return self.agent.gym_action(sess, diff_frame)
 
     def train(self, sess, diff_frames, actions, rewards):
-        #self.logger.set_time_start()
         loss = self.agent.train(sess, diff_frames, actions, rewards)
-        #self.logger.logtime('Training', 1)
+        self.taken_train_steps += 1
+        if self.taken_train_steps == 1:
+            self.epochlogger.set_time_start()
+        if self.taken_train_steps % 500 == 0:
+            self.logger.loginto(str(self.taken_train_steps))
+            self.epoch_log(sess, 500, loss)
         return loss
 
     def set_time_start(self):
@@ -32,9 +36,9 @@ class Logging_Agent():
         self.logger.logtime('Playing iteration')
         self.logger.set_time_start()
 
-    def epoch_log(self, sess, epoch_number, loss):
-        self.epochlogger.loginfo("Epoch %s loss: %s" % (epoch_number, loss))
-        self.epochlogger.logtime('Epoch iteration %s' % epoch_number)
+    def epoch_log(self, sess, number_of_epochs, loss):
+        self.epochlogger.loginfo("Loss after %s more epochs: %s" % (number_of_epochs, loss))
+        self.epochlogger.logtime('%s epochs' % number_of_epochs)
         #self.logger.set_time_start()
         #self.log_matrices(sess)
 
