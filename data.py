@@ -23,6 +23,9 @@ class Dataset():
 		self.diff_frames = None
 		self.actions = None
 		self.rewards = None
+		self.f_buffer = []
+		self.a_buffer = []
+		self.r_buffer = []
 		self.size = 0
 		self.pos = 0
 
@@ -33,25 +36,42 @@ class Dataset():
 		h_rewards = rewards.size
 		assert h_frames == h_actions == h_rewards, "arguments to Dataset.add() need to have equal height"
 
-		#add data into dataset
-		if self.size==0:
-			self.diff_frames = diff_frames
-			self.actions = actions
-			self.rewards = rewards
-		else:
-			self.diff_frames = np.concatenate((self.diff_frames, diff_frames), axis=0)
-			self.actions     = np.concatenate((self.actions, actions))
-			self.rewards     = np.concatenate((self.rewards, rewards))
+		#add data into buffer
+		self.f_buffer.append(diff_frames)
+		self.a_buffer.append(actions)
+		self.r_buffer.append(rewards)
 		self.size = self.size + h_frames
 
 	def reset(self):
 		self.diff_frames = None
 		self.actions = None
 		self.rewards = None
+		self.f_buffer = []
+		self.a_buffer = []
+		self.r_buffer = []
 		self.size = 0
 		self.pos = 0
 
+	def incorporate_buffer(self):
+		"""
+		Forces the data in the buffer to be added into the dataset.
+		Best to do this after finishing adding all data to the buffer.
+		"""
+		if self.f_buffer:
+			if not self.diff_frames:
+				self.diff_frames = np.concatenate(self.f_buffer, axis=0)
+				self.actions     = np.concatenate(self.a_buffer)
+				self.rewards     = np.concatenate(self.r_buffer)
+			else:
+				self.diff_frames = np.concatenate([self.diff_frames] + self.f_buffer, axis=0)
+				self.actions     = np.concatenate([self.actions] + self.a_buffer)
+				self.rewards     = np.concatenate([self.rewards] + self.r_buffer)
+			self.f_buffer = []
+			self.a_buffer = []
+			self.r_buffer = []
+
 	def sample(self, batch_size, random=False):
+		self.incorporate_buffer()
 		assert self.size != 0, "dataset must not be empty"
 		assert batch_size <= self.size, "batch must be smaller than full dataset"
 		if not random:

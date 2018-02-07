@@ -62,15 +62,16 @@ class BasicAgent():
             self.W1 = weight_variable([80*80, hidden_size], "W1")
             self.W2 = weight_variable([hidden_size, 1], "W2")
 
-            self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
-            self.actions = tf.placeholder(shape=(None,),     dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
-            self.rewards = tf.placeholder(shape=(None,),     dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
+        self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
+        self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
+        self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
 
             self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
             self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
-            # loss = - sum over i of reward_i * p(action_i | frame_i)
-            self.loss = - tf.reduce_sum(self.rewards * (self.actions * self.output_layer + (1-self.actions)*(1-self.output_layer)), name="loss")
+        # loss = - sum over i of reward_i * logp(action_i | frame_i)
+        self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
+                                    name="loss")
 
             self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
             self.train_step = self.Optimizer.minimize(self.loss)
@@ -90,3 +91,6 @@ class BasicAgent():
         feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
         return loss
+
+    def set_time_start(self):
+        return
