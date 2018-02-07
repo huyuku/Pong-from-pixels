@@ -13,7 +13,7 @@ from game import *
 from config import *
 from worker import *
 
-PARALLEL = True
+PARALLEL = False
 
 
 def update_target_graph(from_scope,to_scope):
@@ -49,11 +49,22 @@ class Coordinator:
         return f
 
 @Coordinator( PARALLEL )
-def play(sess, dataset, agent, env):
+def play(sess, dataset, agent, env, GAMES_PER_ITER=GAMES_PER_ITER):
     '''Plays games against itself, sequentially or in parallel.
     IMPORTANT: if you're changing it, make sure the first argument is still sess!'''
-    f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
-    dataset.add(f,a,r)
+    for i_game in range(GAMES_PER_ITER):
+
+        f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
+        dataset.add(f,a,r)
+        if a_s>o_s:
+            global wins
+            wins += 1
+        else:
+            global losses
+            losses += 1
+        if i_game % 20 == 0:
+            agent.playing_log(i_game, wins, losses)
+            print("Game {0}. Agent: {1}, Opponent: {2}".format(i_game, a_s, o_s))
 
 class Worker():
     def __init__(self, name, agent, gpu_idx, dataset, test_on_cpu=False):
@@ -104,6 +115,8 @@ logger = debugtools.Logger()
 def main_function():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
+        global wins
+        global losses
         wins = 0
         losses = 0
         agent.set_time_start()
@@ -111,17 +124,10 @@ def main_function():
             dataset.reset()
             print("Iteration {0}".format(i+1))
             print("Playing games:")
-            for i_game in range(GAMES_PER_ITER):
-                play(sess, dataset, agent, env)
-#                f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
-#                dataset.add(f,a,r)
-#                if a_s>o_s:
-#                    wins += 1
-#                else:
-#                    losses += 1
-#                if i_game % 20 == 0:
-#                    agent.playing_log(i_game, wins, losses)
-                    #print("Game {0}. Agent: {1}, Opponent: {2}".format(i_game, a_s, o_s))
+            play(sess, dataset, agent, env, GAMES_PER_ITER) # A bit unhappy with GAMES_PER_ITER happening inside here, instead of
+                                                            # in a foor loop, but have no better solution atm
+
+
             print("Size of dataset: {0}".format(dataset.size))
             print("Training:")
             for epoch in range(EPOCHS_PER_ITER):
