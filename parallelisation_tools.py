@@ -1,8 +1,10 @@
 import tensorflow as tf
 import game
 import gym
-
-WORKERS = [] # just a nonsense list in order to prevent syntax errors, as the real WORKERS is in main.py
+from config import NUM_GPUS
+import threading
+import multiprocessing
+from time import sleep
 
 def update_target_graph(from_scope,to_scope):
     from_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, from_scope)
@@ -15,15 +17,22 @@ def update_target_graph(from_scope,to_scope):
 
 
 class Coordinator():
-    '''Wraps a function in order to parallelise it
+    '''Wraps a function in order to parallelise it, and calls the a function to create the separate workers
 
-    *arguments
+    * arguments to __init__:
 
     condition
         if False, calling the class as a decorator just returns the decorated function f
         if True, each worker in the global WORKER list is started in a separate thread on f
 
-    *comments
+    * arguments to __call__:
+
+    f
+        the function to be wrapped
+    args
+        hmmm what are they doing there?
+
+    * comments:
 
     not sure if the sleep timer is necessary. It's only there because the Juliani functions
     this was inspired by uses it
@@ -35,19 +44,20 @@ class Coordinator():
 
     def __call__(self, f):
         if self.condition:
-            print("I'm here!")
             def wrapper(*args):
                 sess = args[0]
-                worker_threads = []
-                global WORKERS
-                for worker in WORKERS:
+                Agent_class = args[1].__class__
+                dataset = args[2]
+                workers = create_workers(Agent_class, dataset)
+                threads = []
+                for worker in workers:
                     worker.sess = sess
                     worker_work = lambda: worker.work(f)
                     t = threading.Thread(target=(worker_work))
                     t.start()
                     sleep(0.1)
-                    worker_threads.append(t)
-                self.coord.join(worker_threads)
+                    threads.append(t)
+                self.coord.join(threads)
             return wrapper
         return f
 
@@ -73,16 +83,28 @@ class Worker():
 
     def work(self, play_function):
         print("Starting play with worker "+self.name+" on GPU "+self.gpu_idx+"...")
-        play_function(self.sess, self.dataset, self.local_agent, self.env, self.name)
+        play_function(self.sess, self.local_agent, self.dataset, self.env, self.name)
 
-num_workers = multiprocessing.cpu_count() # Set WORKERS to number of available CPU threads
-WORKERS = []
-# Create worker classes
-num_gpus = 4
-gpu_idx = 0
-test_on_cpu = True
-for i in range(num_workers):
-    WORKERS.append(pll.Worker(str(i), wrapped_agent("worker_" + str(i)), gpu_idx, dataset, test_on_cpu=test_on_cpu))
-    gpu_idx += 1
-    if gpu_idx > num_gpus-1:
-        gpu_idx = 0
+def create_workers(Agent_class, dataset):
+    '''
+    Initialises instances of the Worker class for the desired number of parallel threads to run
+
+    * arguments:
+
+    Agent_class
+        the class of the agent to be used as a worker on the different threads
+    dataset
+        where to store the work conducted by the workers
+    '''
+    num_workers = multiprocessing.cpu_count() # Set workers to number of available CPU threads
+    workers = []
+    NUM_GPUS = 4
+    gpu_idx = 0
+    test_on_cpu = True
+    for i in range(num_workers):
+        workers.append(Worker(str(i), Agent_class("worker_" + str(i)), gpu_idx, dataset, test_on_cpu=test_on_cpu))
+        gpu_idx += 1
+        if gpu_idx > NUM_GPUS-1:
+            gpu_idx = 0
+
+    return workers

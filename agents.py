@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import debugtools
+import logging_agent
+from config import HIDDEN_SIZE, LEARNING_RATE
 
 # Copies one set of variables to another.
 # Used to set worker network parameters to those of global network.
@@ -12,6 +14,26 @@ def update_target_graph(from_scope,to_scope):
     for from_var,to_var in zip(from_vars,to_vars):
         op_holder.append(to_var.assign(from_var))
     return op_holder
+
+def wrapped_agent(name):
+    '''
+    Wrapper used to make it easier to modify agents using modules (e.g. the logging module),
+    without there being multiple other dependencies in main.py that have to be changed should
+    an additional wrapper be introduced on the agent
+
+    * arguments:
+
+    name
+        a str used as a prefix (or scope) for the tensorflow variables
+
+    * comments:
+
+    N.A.
+
+    '''
+    initial_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
+    final_agent = logging_agent.Logging_Agent(initial_agent)
+    return final_agent
 
 class BasicAgent():
     '''

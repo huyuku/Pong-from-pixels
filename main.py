@@ -14,19 +14,19 @@ from game import *
 from config import *
 from worker import *
 
-PARALLEL = True
+PARALLEL = False #True
 
 @pll.Coordinator( PARALLEL )
-def play(sess, dataset, agent, env, thread="worker_1", GAMES_PER_ITER=GAMES_PER_ITER):
+def play(sess, agent, dataset, env, thread="worker_1", GAMES_PER_ITER=GAMES_PER_ITER):
     '''
     Plays games against itself, sequentially or in parallel.
 
     * comments:
 
-    if you're changing it, make sure the first argument is still sess!
+    IMPORTANT: if you're changing it, make sure the first three arguments are still sess, agent and dataset!
+    In particular there's a depndency with the Worker.work function in parallelisation_tools
     '''
     for i_game in range(GAMES_PER_ITER):
-
         f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
         dataset.add(f,a,r)
         if a_s>o_s:
@@ -39,31 +39,10 @@ def play(sess, dataset, agent, env, thread="worker_1", GAMES_PER_ITER=GAMES_PER_
             agent.playing_log(i_game, wins, losses)
             print("{0}. Game {1}. Agent: {2}, Opponent: {3}".format(thread, i_game, a_s, o_s))
 
-def wrapped_agent(name):
-    '''
-    Wrapper used to make it easier to modify agents using modules (e.g. the logging module),
-    without there being multiple other dependencies in main.py that have to be changed should
-    an additional wrapper be introduced on the agent
 
-    * arguments:
 
-    name
-        a str used as a prefix (or scope) for the tensorflow variables
-
-    * comments:
-
-    N.A.
-
-    '''
-    initial_agent = agents.BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
-    final_agent = logging_agent.Logging_Agent(initial_agent)
-    return final_agent
-
-agent = wrapped_agent('main_agent')
+agent = agents.wrapped_agent('main_agent')
 dataset = data.Dataset()
-if PARALLEL:
-
-
 
 env = gym.make('Pong-v0')
 logging.basicConfig(filename='info.log',level=logging.INFO)
@@ -81,7 +60,7 @@ def main_function():
             dataset.reset()
             print("Iteration {0}".format(i+1))
             print("Playing games:")
-            play(sess, dataset, agent, env, GAMES_PER_ITER) # A bit unhappy with GAMES_PER_ITER happening inside here, instead of
+            play(sess, agent, dataset, env, GAMES_PER_ITER) # A bit unhappy with GAMES_PER_ITER happening inside here, instead of
                                                             # in a foor loop, but have no better solution atm
 
 
