@@ -29,7 +29,10 @@ def main_function():
 			print("Iteration {0}".format(i+1))
 			print("Playing games...")
 			for i_game in range(GAMES_PER_ITER):
-				f, a, r, o_s, a_s = game.create_play_data(sess, agent, env, without_net=WITHOUT_NET, quick_play=QUICK_PLAY)
+				f, a, r, o_s, a_s = game.create_play_data(sess, agent, env,
+														  render=RENDER,
+														  without_net=WITHOUT_NET,
+														  quick_play=QUICK_PLAY)
 				dataset.add(f,a,r)
 				scored += a_s
 				if a_s>o_s:

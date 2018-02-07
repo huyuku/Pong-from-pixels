@@ -18,7 +18,11 @@ def preprocess(frame):
 	frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
 	return frame.astype(np.float).ravel()
 
-def create_play_data(session, agent, env, without_net=False, quick_play=False):
+def create_play_data(session, agent, env,
+					 render=False,
+					 reward_discounting=False,
+					 without_net=False,
+					 quick_play=False):
 	"""
 	Generates data of the agent playing against the built-in pong AI.
 
@@ -26,6 +30,8 @@ def create_play_data(session, agent, env, without_net=False, quick_play=False):
 		session: the tf.Session used to run the agent.
 		agent: the agent.
 		env: the gym environment.
+		render: if True, renders the game via gym's render function.
+		reward_discounting: if True, makes reward higher closer to the end of the episode.
 		without_net: if True, samples actions randomly. Used for testing.
 		quick_play: plays games to the first point scored, instead of to 20.
 
@@ -52,6 +58,8 @@ def create_play_data(session, agent, env, without_net=False, quick_play=False):
 	current_frame = 0
 	current_action = env.action_space.sample() #take a random action to start with
 	while not done:
+		if render:
+			env.render()
 		#make observation
 		last_frame = current_frame
 		f, r, done, i = env.step(current_action)
@@ -77,7 +85,11 @@ def create_play_data(session, agent, env, without_net=False, quick_play=False):
 			#package up the data for the frames involved in this goal
 			diff_frame_sets.append(np.stack(diff_frames, axis=0))
 			action_sets.append(np.stack(actions, axis=0))
-			reward_sets.append(r * np.ones(len(actions)))
+			if reward_discounting:
+				rewards = r * np.linspace(0,1,len(actions))
+			else:
+				rewards = r * np.ones(len(actions))
+			reward_sets.append(rewards)
 			diff_frames  = []
 			actions = []
 
