@@ -11,4 +11,6 @@ WITHOUT_NET = False
 QUICK_PLAY = False
 RENDER = False
 debug = False
-print_analytics = False
+print_analytics = True
+
+NUM_GPUS = 4
