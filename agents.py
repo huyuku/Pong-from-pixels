@@ -102,11 +102,17 @@ class ConvNetAgent():
 
     * arguments:
 
-    hidden_size, default=100
-        controls the number of nodes in the hidden layer.
+    channels_num, default=30
+        controls the number of channels in each conv layer.
+
+    connected_size, default=100
+        controls the number of nodes in the fully-connected layer.
 
     learning_rate, default=0.01
         controls the learning rate of the optimiser used for training.
+
+    dropout_p, default=0.5
+        controls dropout probability.
 
     * comments:
 
@@ -158,8 +164,9 @@ class ConvNetAgent():
                                                    activation=tf.nn.relu,
                                                    name='fully_connected')
 
+            self.keep_prob = tf.placeholder_with_default(dropout_p, [1])
             self.dropout = tf.layers.dropout(inputs=self.fully_connected,
-                                             rate=dropout_p,
+                                             rate=self.keep_prob,
                                              name='dropout')
 
             self.output_layer = tf.layers.dense(inputs=self.dropout,
@@ -174,15 +181,15 @@ class ConvNetAgent():
             self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
             self.train_step = self.Optimizer.minimize(self.loss)
 
-    def action(self, sess, diff_frame):
+    def action(self, sess, diff_frames):
         '''returns a probability of going UP at this frame'''
-        feed_dict = {self.frames:diff_frame}
+        feed_dict = {self.frames:diff_frames, self.dropout:1.0}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
         return action
 
-    def gym_action(self, sess, diff_frame):
-        return 3 + self.action(sess, diff_frame)
+    def gym_action(self, sess, diff_frames):
+        return 3 + self.action(sess, diff_frames)
 
     def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
