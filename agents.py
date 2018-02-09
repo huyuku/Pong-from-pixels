@@ -102,13 +102,13 @@ class ConvNetAgent():
 
     * arguments:
 
-    channels_num, default=30
+    channels_num, default=32
         controls the number of channels in each conv layer.
 
     connected_size, default=100
         controls the number of nodes in the fully-connected layer.
 
-    learning_rate, default=0.01
+    learning_rate, default=0.001
         controls the learning rate of the optimiser used for training.
 
     dropout_p, default=0.5
@@ -120,9 +120,9 @@ class ConvNetAgent():
 
     '''
     def __init__(self, scope,
-                 channels_num=30,
-                 connected_size=100,
-                 learning_rate=0.01,
+                 channels_num=32,
+                 connected_size=128,
+                 learning_rate=0.001,
                  dropout_p=0.5
                  ):
         with tf.variable_scope(scope):
@@ -140,7 +140,7 @@ class ConvNetAgent():
                                           activation=tf.nn.relu,
                                           name="conv1")
 
-            self.pool1 = tf.layers.max_pooling2d(inputs=conv1,
+            self.pool1 = tf.layers.max_pooling2d(inputs=self.conv1,
                                                  pool_size=[2,2],
                                                  strides=2,
                                                  name='pool1')
@@ -152,19 +152,19 @@ class ConvNetAgent():
                                           activation=tf.nn.relu,
                                           name="conv2")
 
-            self.pool2 = tf.layers.max_pooling2d(inputs=conv2,
+            self.pool2 = tf.layers.max_pooling2d(inputs=self.conv2,
                                                  pool_size=[2,2],
                                                  strides=2,
                                                  name='pool2')
 
-            self.pool2flat = tf.reshape(self.pool2flat, [-1, 20*20*channels_num])
+            self.pool2flat = tf.reshape(self.pool2, [-1, 20*20*channels_num])
 
             self.fully_connected = tf.layers.dense(inputs=self.pool2flat,
                                                    units=connected_size,
                                                    activation=tf.nn.relu,
                                                    name='fully_connected')
 
-            self.keep_prob = tf.placeholder_with_default(dropout_p, [1])
+            self.keep_prob = tf.placeholder_with_default(dropout_p, [])
             self.dropout = tf.layers.dropout(inputs=self.fully_connected,
                                              rate=self.keep_prob,
                                              name='dropout')
@@ -183,7 +183,7 @@ class ConvNetAgent():
 
     def action(self, sess, diff_frames):
         '''returns a probability of going UP at this frame'''
-        feed_dict = {self.frames:diff_frames, self.dropout:1.0}
+        feed_dict = {self.frames_in:diff_frames, self.keep_prob:1.0}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
         return action
@@ -193,7 +193,7 @@ class ConvNetAgent():
 
     def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
-        feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
+        feed_dict={self.frames_in:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
         return loss
 
