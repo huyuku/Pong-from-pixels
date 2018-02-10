@@ -19,7 +19,7 @@ def preprocess(frame):
 	return frame.astype(np.float).ravel()
 
 def create_play_data(session, agent, env,
-					 render=False,
+					 render=RENDER,
 					 reward_discounting=False,
 					 without_net=False,
 					 quick_play=False):
