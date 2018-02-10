@@ -70,8 +70,9 @@ def main_function():
 
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
                 loss = agent.train(sess,f,a,r)
-                for worker in WORKERS:
-                    worker.update_local_ops
+            #     to do: fix this to update workers with weights of newly trained net!
+			#      for worker in WORKERS:
+            #        worker.update_local_ops
                 if epoch % 500 == 0:
                     agent.epoch_log(sess, epoch, loss)
                     #print("Epoch {0}. Loss: {1}".format(epoch, loss))

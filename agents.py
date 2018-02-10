@@ -66,15 +66,15 @@ class BasicAgent():
         self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
         self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
 
-            self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
-            self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
+        self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
+        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
         # loss = - sum over i of reward_i * logp(action_i | frame_i)
         self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
                                     name="loss")
 
-            self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-            self.train_step = self.Optimizer.minimize(self.loss)
+        self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        self.train_step = self.Optimizer.minimize(self.loss)
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
