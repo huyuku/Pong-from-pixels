@@ -62,16 +62,16 @@ class BasicAgent():
             self.W1 = weight_variable([80*80, hidden_size], "W1")
             self.W2 = weight_variable([hidden_size, 1], "W2")
 
-        self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
-        self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
-        self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
+            self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
+            self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
+            self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
 
         self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
         self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
-        # loss = - sum over i of reward_i * logp(action_i | frame_i)
-        self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
-                                    name="loss")
+            # loss = - sum over i of reward_i * logp(action_i | frame_i)
+            self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
+                                        name="loss")
 
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         self.train_step = self.Optimizer.minimize(self.loss)
@@ -89,6 +89,111 @@ class BasicAgent():
     def train(self, sess, diff_frames, actions, rewards):
         '''trains the agent on the data'''
         feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
+        _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
+        return loss
+
+    def set_time_start(self):
+        return
+
+class ConvNetAgent():
+    '''
+    Uses a ConvNet to compute the probabilty of going UP,
+    then samples using that probability to decide its action.
+
+    * arguments:
+
+    channels_num, default=32
+        controls the number of channels in each conv layer.
+
+    connected_size, default=100
+        controls the number of nodes in the fully-connected layer.
+
+    learning_rate, default=0.001
+        controls the learning rate of the optimiser used for training.
+
+    dropout_p, default=0.5
+        controls dropout probability.
+
+    * comments:
+
+    uses tf.AdamOptimiser for its training step.
+
+    '''
+    def __init__(self, scope,
+                 channels_num=32,
+                 connected_size=128,
+                 learning_rate=0.001,
+                 dropout_p=0.5
+                 ):
+        with tf.variable_scope(scope):
+
+            self.frames_in = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
+            self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
+            self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
+
+            self.frames = tf.reshape(self.frames_in, [-1, 80, 80, 1])
+
+            self.conv1 = tf.layers.conv2d(inputs=self.frames,
+                                          filters=channels_num,
+                                          kernel_size=[5,5],
+                                          padding='same',
+                                          activation=tf.nn.relu,
+                                          name="conv1")
+
+            self.pool1 = tf.layers.max_pooling2d(inputs=self.conv1,
+                                                 pool_size=[2,2],
+                                                 strides=2,
+                                                 name='pool1')
+
+            self.conv2 = tf.layers.conv2d(inputs=self.pool1,
+                                          filters=channels_num,
+                                          kernel_size=[5,5],
+                                          padding='same',
+                                          activation=tf.nn.relu,
+                                          name="conv2")
+
+            self.pool2 = tf.layers.max_pooling2d(inputs=self.conv2,
+                                                 pool_size=[2,2],
+                                                 strides=2,
+                                                 name='pool2')
+
+            self.pool2flat = tf.reshape(self.pool2, [-1, 20*20*channels_num])
+
+            self.fully_connected = tf.layers.dense(inputs=self.pool2flat,
+                                                   units=connected_size,
+                                                   activation=tf.nn.relu,
+                                                   name='fully_connected')
+
+            self.keep_prob = tf.placeholder_with_default(dropout_p, [])
+            self.dropout = tf.layers.dropout(inputs=self.fully_connected,
+                                             rate=self.keep_prob,
+                                             name='dropout')
+
+            self.output_layer = tf.layers.dense(inputs=self.dropout,
+                                                units=1,
+                                                activation=tf.nn.sigmoid,
+                                                name='out')
+
+            # loss = - sum over i of reward_i * logp(action_i | frame_i)
+            self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
+                                        name="loss")
+
+            self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+            self.train_step = self.Optimizer.minimize(self.loss)
+
+    def action(self, sess, diff_frames):
+        '''returns a probability of going UP at this frame'''
+        feed_dict = {self.frames_in:diff_frames, self.keep_prob:1.0}
+        predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
+        action = np.random.binomial(1, predicted_action)
+        return action
+
+    def gym_action(self, sess, diff_frames):
+        return 3 + self.action(sess, diff_frames)
+
+    def train(self, sess, diff_frames, actions, rewards):
+        '''trains the agent on the data'''
+        feed_dict={self.frames_in:diff_frames, self.actions:actions, self.rewards:rewards}
         _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
         return loss
 
