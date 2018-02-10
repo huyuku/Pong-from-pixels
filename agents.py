@@ -31,7 +31,8 @@ def wrapped_agent(name):
     N.A.
 
     '''
-    final_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
+    #final_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
+    final_agent = ConvNetAgent(name)
     #final_agent = logging_agent.Logging_Agent(initial_agent)
     return final_agent
 
