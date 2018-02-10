@@ -116,7 +116,7 @@ def create_workers(Agent_class, dataset):
     dataset
         where to store the work conducted by the workers
     '''
-    num_workers = NUM_CPUS
+    num_workers = NUM_CPUS/4
     global WORKERS
     gpu_idx = 0
     for i in range(num_workers):
