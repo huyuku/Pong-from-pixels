@@ -24,7 +24,7 @@ GPUs = [x.name for x in device_lib.list_local_devices() if x.device_type == 'GPU
 NUM_GPUS = len(GPUs)
 
 #Main setting
-PARALLEL  = True
+PARALLEL = True
 if PARALLEL:
     print("Detected %s CPUs and %s  GPUs" % (NUM_CPUS, NUM_GPUS))
 
@@ -34,3 +34,5 @@ else: TEST_ON_CPU = PARALLEL
 if TEST_ON_CPU: NUM_GPUS = 4
 if TEST_ON_CPU:
     print("But simulating exeuction on 4 GPUs for testing purposes")
+
+WORKERS = []

@@ -33,13 +33,14 @@ def play(sess, agent, dataset, env, thread="worker_1", GAMES_PER_ITER=GAMES_PER_
         else:
             global losses
             losses += 1
-        if i_game % 20 == 0:
-            agent.playing_log(i_game, wins, losses)
+        if i_game % 1 == 0: #%20
+            if agent.__class__ == logging_agent.Logging_Agent:
+                #Currently disabling this due to stability reasons. See bug note
+                #in the drive
+                agent.playing_log(i_game, wins, losses)
             print("{0}. Game {1}. Agent: {2}, Opponent: {3}".format(thread, i_game, a_s, o_s))
 
-
-
-agent = agents.wrapped_agent('main_agent')
+agent = agents.wrapped_agent('main_agent') #note that: wrapped_agent is also called by parallelisation_tools
 dataset = data.Dataset()
 
 env = gym.make('Pong-v0')
@@ -60,20 +61,23 @@ def main_function():
             print("Playing games:")
             play(sess, agent, dataset, env, GAMES_PER_ITER) # A bit unhappy with GAMES_PER_ITER happening inside here, instead of
                                                             # in a foor loop, but have no better solution atm
-
-
             print("Size of dataset: {0}".format(dataset.size))
             print("Training:")
             for epoch in range(EPOCHS_PER_ITER):
-
                 f,a,r = dataset.sample(TRAIN_BATCH_SIZE)
                 loss = agent.train(sess,f,a,r)
-            #     to do: fix this to update workers with weights of newly trained net!
-			#      for worker in WORKERS:
-            #        worker.update_local_ops
+
                 if epoch % 500 == 0:
-                    agent.epoch_log(sess, epoch, loss)
-                    #print("Epoch {0}. Loss: {1}".format(epoch, loss))
+                    if agent.__class__ == logging_agent.Logging_Agent:
+                        agent.epoch_log(sess, epoch, loss)
+                    print("Epoch {0}. Loss: {1}".format(epoch, loss))
+
+            #Copy weights to workers to prepare for next run
+            for worker in WORKERS:
+                sess.run(worker.update_local_ops('main_agent',worker.name))
+                if agent.__class__ == agents.BasicAgent:
+                    #Ascertain that weights were copied correctly
+                    pll.test_update(sess, worker, agent)
 
 
 if __name__ == "__main__":

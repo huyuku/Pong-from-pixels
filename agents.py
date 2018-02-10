@@ -31,8 +31,8 @@ def wrapped_agent(name):
     N.A.
 
     '''
-    initial_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
-    final_agent = logging_agent.Logging_Agent(initial_agent)
+    final_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
+    #final_agent = logging_agent.Logging_Agent(initial_agent)
     return final_agent
 
 class AgentTemplate():
@@ -98,7 +98,7 @@ class BasicAgent(AgentTemplate):
     uses tf.AdamOptimiser for its training step.
 
     '''
-    def __init__(self, scope, hidden_size=100, learning_rate=0.01):
+    def __init__(self, scope, hidden_size=HIDDEN_SIZE, learning_rate=LEARNING_RATE):
         with tf.variable_scope(scope):
             def weight_variable(shape, name):
                 initial = tf.truncated_normal(shape, stddev=0.05)
