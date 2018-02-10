@@ -35,9 +35,52 @@ def wrapped_agent(name):
     final_agent = logging_agent.Logging_Agent(initial_agent)
     return final_agent
 
+class AgentTemplate():
+    '''
+    A template containing the main methods used to interact with the environment
+    using the agent. This makes it quicker to define new agents without having
+    to copy all the methods.
+
+    * arguments:
+
+    Just some dummy arguments to prevent reference errors in defining the functions.
+
+    * comments:
+
+    In case one agent uses a different method than the template (e.g. the conv
+    agent uses dropout, but the basic one doesn't), then just give that agent
+    a method to overwrite the template method
+    '''
+    def __init__(self):
+        self.frames = None
+        self.action = None
+        self.actions = None
+        self.rewards = None
+        self.train_step = None
+        self.loss = None
+
+    def action(self, sess, diff_frame):
+        '''returns a probability of going UP at this frame'''
+        feed_dict = {self.frames:diff_frame}
+        predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
+        action = np.random.binomial(1, predicted_action)
+        return action
+
+    def gym_action(self, sess, diff_frame):
+        return 3 + self.action(sess, diff_frame)
+
+    def train(self, sess, diff_frames, actions, rewards):
+        '''trains the agent on the data'''
+        feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
+        _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
+        return loss
+
+    def set_time_start(self):
+        return
 
 
-class BasicAgent():
+
+class BasicAgent(AgentTemplate):
     '''
     Uses a 1-hidden-layer dense NN to compute probability of going UP,
     then samples using that probability to decide its action.
@@ -78,26 +121,7 @@ class BasicAgent():
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         self.train_step = self.Optimizer.minimize(self.loss)
 
-    def action(self, sess, diff_frame):
-        '''returns a probability of going UP at this frame'''
-        feed_dict = {self.frames:diff_frame}
-        predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
-        action = np.random.binomial(1, predicted_action)
-        return action
-
-    def gym_action(self, sess, diff_frame):
-        return 3 + self.action(sess, diff_frame)
-
-    def train(self, sess, diff_frames, actions, rewards):
-        '''trains the agent on the data'''
-        feed_dict={self.frames:diff_frames, self.actions:actions, self.rewards:rewards}
-        _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
-        return loss
-
-    def set_time_start(self):
-        return
-
-class ConvNetAgent():
+class ConvNetAgent(AgentTemplate):
     '''
     Uses a ConvNet to compute the probabilty of going UP,
     then samples using that probability to decide its action.
@@ -184,20 +208,9 @@ class ConvNetAgent():
             self.train_step = self.Optimizer.minimize(self.loss)
 
     def action(self, sess, diff_frames):
-        '''returns a probability of going UP at this frame'''
+        '''returns a probability of going UP at this frame
+        overwrites the AgentTemplate action because have to tailor it to dropout'''
         feed_dict = {self.frames_in:diff_frames, self.keep_prob:1.0}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
         return action
-
-    def gym_action(self, sess, diff_frames):
-        return 3 + self.action(sess, diff_frames)
-
-    def train(self, sess, diff_frames, actions, rewards):
-        '''trains the agent on the data'''
-        feed_dict={self.frames_in:diff_frames, self.actions:actions, self.rewards:rewards}
-        _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
-        return loss
-
-    def set_time_start(self):
-        return
