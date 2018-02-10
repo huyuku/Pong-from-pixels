@@ -105,7 +105,7 @@ class ConvNetAgent():
     channels_num, default=32
         controls the number of channels in each conv layer.
 
-    connected_size, default=100
+    connected_size, default=128
         controls the number of nodes in the fully-connected layer.
 
     learning_rate, default=0.001
@@ -117,6 +117,15 @@ class ConvNetAgent():
     * comments:
 
     uses tf.AdamOptimiser for its training step.
+
+    architecture:
+        conv1
+        pool1
+        conv2
+        pool2
+        fully_connected
+        dropout
+        output
 
     '''
     def __init__(self, scope,
