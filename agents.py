@@ -31,50 +31,34 @@ def wrapped_agent(name):
     N.A.
 
     '''
-    initial_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
-    final_agent = logging_agent.Logging_Agent(initial_agent)
+    #final_agent = BasicAgent(name, HIDDEN_SIZE, LEARNING_RATE)
+    final_agent = ConvNetAgent(name)
+    #final_agent = logging_agent.Logging_Agent(initial_agent)
     return final_agent
 
-class BasicAgent():
+class AgentTemplate():
     '''
-    Uses a 1-hidden-layer dense NN to compute probability of going UP,
-    then samples using that probability to decide its action.
+    A template containing the main methods used to interact with the environment
+    using the agent. This makes it quicker to define new agents without having
+    to copy all the methods.
 
     * arguments:
 
-    hidden_size, default=100
-        controls the number of nodes in the hidden layer.
-
-    learning_rate, default=0.01
-        controls the learning rate of the optimiser used for training.
+    Just some dummy arguments to prevent reference errors in defining the functions.
 
     * comments:
 
-    uses tf.AdamOptimiser for its training step.
-
+    In case one agent uses a different method than the template (e.g. the conv
+    agent uses dropout, but the basic one doesn't), then just give that agent
+    a method to overwrite the template method
     '''
-    def __init__(self, scope, hidden_size=100, learning_rate=0.01):
-        with tf.variable_scope(scope):
-            def weight_variable(shape, name):
-                initial = tf.truncated_normal(shape, stddev=0.05)
-                return tf.Variable(initial, name=name)
-
-            self.W1 = weight_variable([80*80, hidden_size], "W1")
-            self.W2 = weight_variable([hidden_size, 1], "W2")
-
-            self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
-            self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
-            self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
-
-            self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
-            self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
-
-            # loss = - sum over i of reward_i * logp(action_i | frame_i)
-            self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
-                                        name="loss")
-
-            self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-            self.train_step = self.Optimizer.minimize(self.loss)
+    def __init__(self):
+        self.frames = None
+        self.action = None
+        self.actions = None
+        self.rewards = None
+        self.train_step = None
+        self.loss = None
 
     def action(self, sess, diff_frame):
         '''returns a probability of going UP at this frame'''
@@ -95,7 +79,50 @@ class BasicAgent():
     def set_time_start(self):
         return
 
-class ConvNetAgent():
+
+
+class BasicAgent(AgentTemplate):
+    '''
+    Uses a 1-hidden-layer dense NN to compute probability of going UP,
+    then samples using that probability to decide its action.
+
+    * arguments:
+
+    hidden_size, default=100
+        controls the number of nodes in the hidden layer.
+
+    learning_rate, default=0.01
+        controls the learning rate of the optimiser used for training.
+
+    * comments:
+
+    uses tf.AdamOptimiser for its training step.
+
+    '''
+    def __init__(self, scope, hidden_size=HIDDEN_SIZE, learning_rate=LEARNING_RATE):
+        with tf.variable_scope(scope):
+            def weight_variable(shape, name):
+                initial = tf.truncated_normal(shape, stddev=0.05)
+                return tf.Variable(initial, name=name)
+
+            self.W1 = weight_variable([80*80, hidden_size], "W1")
+            self.W2 = weight_variable([hidden_size, 1], "W2")
+
+            self.frames  = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame
+            self.actions = tf.placeholder(shape=(None,), dtype=tf.float32, name="action_in")  # 1 if agent went UP, 0 otherwise
+            self.rewards = tf.placeholder(shape=(None,), dtype=tf.float32, name="reward_in")  # 1 if frame comes from a won game, -1 otherwise
+
+        self.hidden_layer = tf.nn.relu(tf.matmul(self.frames, self.W1), name="hidden_layer")
+        self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
+
+            # loss = - sum over i of reward_i * logp(action_i | frame_i)
+        self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
+                                        name="loss")
+
+        self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        self.train_step = self.Optimizer.minimize(self.loss)
+
+class ConvNetAgent(AgentTemplate):
     '''
     Uses a ConvNet to compute the probabilty of going UP,
     then samples using that probability to decide its action.
@@ -191,20 +218,9 @@ class ConvNetAgent():
             self.train_step = self.Optimizer.minimize(self.loss)
 
     def action(self, sess, diff_frames):
-        '''returns a probability of going UP at this frame'''
+        '''returns a probability of going UP at this frame
+        overwrites the AgentTemplate action because have to tailor it to dropout'''
         feed_dict = {self.frames_in:diff_frames, self.keep_prob:1.0}
         predicted_action = sess.run(self.output_layer, feed_dict=feed_dict)[0,0]
         action = np.random.binomial(1, predicted_action)
         return action
-
-    def gym_action(self, sess, diff_frames):
-        return 3 + self.action(sess, diff_frames)
-
-    def train(self, sess, diff_frames, actions, rewards):
-        '''trains the agent on the data'''
-        feed_dict={self.frames_in:diff_frames, self.actions:actions, self.rewards:rewards}
-        _, loss = sess.run([self.train_step, self.loss], feed_dict=feed_dict)
-        return loss
-
-    def set_time_start(self):
-        return
