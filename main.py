@@ -48,7 +48,7 @@ logging.basicConfig(filename='info.log',level=logging.INFO)
 logger = debugtools.Logger()
 
 def main_function():
-    with tf.Session() as sess:
+    with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
         sess.run(tf.global_variables_initializer())
         global wins
         global losses
