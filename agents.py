@@ -35,6 +35,8 @@ def wrapped_agent(name):
     final_agent = logging_agent.Logging_Agent(initial_agent)
     return final_agent
 
+
+
 class BasicAgent():
     '''
     Uses a 1-hidden-layer dense NN to compute probability of going UP,
@@ -70,7 +72,7 @@ class BasicAgent():
         self.output_layer = tf.nn.sigmoid(tf.matmul(self.hidden_layer, self.W2), name="output_layer")
 
             # loss = - sum over i of reward_i * logp(action_i | frame_i)
-            self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
+        self.loss = -tf.reduce_mean(self.rewards * (self.actions * self.output_layer + (1-self.actions) * (1-self.output_layer)),
                                         name="loss")
 
         self.Optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)

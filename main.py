@@ -14,12 +14,10 @@ from game import *
 from config import *
 from worker import *
 
-PARALLEL = False #True
-
 @pll.Coordinator( PARALLEL )
 def play(sess, agent, dataset, env, thread="worker_1", GAMES_PER_ITER=GAMES_PER_ITER):
     '''
-    Plays games against itself, sequentially or in parallel.
+    Plays games against OpenAI bot, sequentially or in parallel.
 
     * comments:
 

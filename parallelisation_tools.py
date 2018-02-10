@@ -1,7 +1,8 @@
 import tensorflow as tf
 import game
+import data
 import gym
-from config import NUM_GPUS
+from config import NUM_CPUS, NUM_GPUS, TEST_ON_CPU
 import threading
 import multiprocessing
 from time import sleep
@@ -65,7 +66,7 @@ class Worker():
     '''Executes play function as a separate thread'''
     def __init__(self, name, agent, gpu_idx, dataset, test_on_cpu=False):
         self.name = "worker_" + str(name)
-        self.train_data = game.train_set()
+        self.train_data = data.Dataset()
         self.gpu_idx = str(gpu_idx)
         self.dataset = dataset
         self.sess = None
@@ -96,13 +97,11 @@ def create_workers(Agent_class, dataset):
     dataset
         where to store the work conducted by the workers
     '''
-    num_workers = multiprocessing.cpu_count() # Set workers to number of available CPU threads
+    num_workers = NUM_CPUS
     workers = []
-    NUM_GPUS = 4
     gpu_idx = 0
-    test_on_cpu = True
     for i in range(num_workers):
-        workers.append(Worker(str(i), Agent_class("worker_" + str(i)), gpu_idx, dataset, test_on_cpu=test_on_cpu))
+        workers.append(Worker(str(i), Agent_class("worker_" + str(i)), gpu_idx, dataset, test_on_cpu=TEST_ON_CPU))
         gpu_idx += 1
         if gpu_idx > NUM_GPUS-1:
             gpu_idx = 0
