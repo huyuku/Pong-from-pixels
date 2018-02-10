@@ -79,7 +79,7 @@ class Coordinator():
 
 class Worker():
     '''Executes play function as a separate thread'''
-    def __init__(self, name, agent, gpu_idx, dataset):
+    def __init__(self, name, Agent_class, gpu_idx, dataset):
         self.name = "worker_" + str(name)
         self.train_data = data.Dataset()
         self.gpu_idx = str(gpu_idx)
@@ -95,7 +95,8 @@ class Worker():
         #Create the local copy of the network and the tensorflow op to copy global paramters to local network
         with tf.device(self.device+self.gpu_idx):
             with tf.name_scope(name) as scope:
-                self.local_agent = agent
+                self.local_agent = Agent_class(self.name)
+                #should't need to pass the function here, should be able to include arguments
                 self.update_local_ops = update_target_graph
 
     def work(self, play_function):
@@ -119,7 +120,7 @@ def create_workers(Agent_class, dataset):
     global WORKERS
     gpu_idx = 0
     for i in range(num_workers):
-        WORKERS.append(Worker(str(i), Agent_class("worker_" + str(i)), gpu_idx, dataset))
+        WORKERS.append(Worker(str(i), Agent_class, gpu_idx, dataset))
         gpu_idx += 1
         if gpu_idx > NUM_GPUS-1:
             gpu_idx = 0
