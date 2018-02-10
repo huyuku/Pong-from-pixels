@@ -78,6 +78,7 @@ def main_function():
                 if agent.__class__ == agents.BasicAgent:
                     #Ascertain that weights were copied correctly
                     pll.test_update(sess, worker, agent)
+                    #yay
 
 
 if __name__ == "__main__":
