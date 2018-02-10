@@ -79,7 +79,7 @@ class Coordinator():
 
 class Worker():
     '''Executes play function as a separate thread'''
-    def __init__(self, name, agent, gpu_idx, dataset, test_on_cpu=False):
+    def __init__(self, name, agent, gpu_idx, dataset):
         self.name = "worker_" + str(name)
         self.train_data = data.Dataset()
         self.gpu_idx = str(gpu_idx)
@@ -87,10 +87,10 @@ class Worker():
         self.sess = None
         self.env = env = gym.make('Pong-v0')
         self.first_call = True
-        if test_on_cpu:
+        if TEST_ON_CPU:
             self.device = '/cpu:'
         else:
-            self.device = '/gpu:'
+            self.device = '/device:GPU:'
 
         #Create the local copy of the network and the tensorflow op to copy global paramters to local network
         with tf.device(self.device+self.gpu_idx):
