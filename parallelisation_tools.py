@@ -119,7 +119,7 @@ def create_workers(Agent_class, dataset):
     global WORKERS
     gpu_idx = 0
     for i in range(num_workers):
-        WORKERS.append(Worker(str(i), Agent_class("worker_" + str(i)), gpu_idx, dataset, test_on_cpu=TEST_ON_CPU))
+        WORKERS.append(Worker(str(i), Agent_class("worker_" + str(i)), gpu_idx, dataset))
         gpu_idx += 1
         if gpu_idx > NUM_GPUS-1:
             gpu_idx = 0
