@@ -100,6 +100,7 @@ class BasicAgent(AgentTemplate):
 
     '''
     def __init__(self, scope, hidden_size=HIDDEN_SIZE, learning_rate=LEARNING_RATE):
+        self.name = scope
         with tf.variable_scope(scope):
             def weight_variable(shape, name):
                 initial = tf.truncated_normal(shape, stddev=0.05)
@@ -161,6 +162,7 @@ class ConvNetAgent(AgentTemplate):
                  learning_rate=0.001,
                  dropout_p=0.5
                  ):
+        self.name = scope
         with tf.variable_scope(scope):
 
             self.frames_in = tf.placeholder(shape=(None, 80*80), dtype=tf.float32, name="frames_in")  # flattened diff_frame

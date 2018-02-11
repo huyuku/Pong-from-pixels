@@ -116,7 +116,7 @@ def create_workers(Agent_class, dataset):
     dataset
         where to store the work conducted by the workers
     '''
-    num_workers = 8 #make this variable later
+    num_workers = 4 #make this variable later
     global WORKERS
     gpu_idx = 0
     for i in range(num_workers):
