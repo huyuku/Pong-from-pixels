@@ -89,8 +89,8 @@ def main_function():
         losses = 0
         agent.set_time_start()
         for i in range(NUM_ITERATIONS):
-            if i == 0: #reset dataset initially. The condition exists because we don't reset in case new weight updates were futile in the challenger test (see below).
-                dataset.reset()
+        #    if i == 0: #reset dataset initially. The condition exists because we don't reset in case new weight updates were futile in the challenger test (see below).
+            dataset.reset()
             print("Iteration {0}".format(i+1))
             print("Playing games:")
             play(sess, agent, dataset, env, GAMES_PER_ITER) # A bit unhappy with GAMES_PER_ITER happening inside here, instead of
@@ -116,7 +116,7 @@ def main_function():
                     if agent.__class__ == agents.BasicAgent:
                         #Ascertain that weights were copied correctly
                         pll.test_update(sess, worker, agent)
-                dataset.reset()
+            #    dataset.reset()
             else:
                 print("Training didn't improve performance (and possibly worsened it). Discarding weight udpates...")
                 sess.run(pll.update_target_graph(agent.name, challenger_agent.name))
