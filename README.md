@@ -4,4 +4,5 @@ This is a side project to learn more about deep reinforcement learning, by train
 We're hoping to learn about many aspects of deep RL, including the theory underpinning policy gradient algorithms, the practical challenges in optimising the code for parallelisation on cloud GPUs, and how to structure an efficient pipeline for taking ML projects from conceptualisation through multiple training and testing iterations.
 
 Work in progress, expecting to update both the code and this description soon.
-Vladimir Mikulik, Jacob Lagerros, Joar Skalse
+
+_Vladimir Mikulik, Jacob Lagerros, Joar Skalse_
