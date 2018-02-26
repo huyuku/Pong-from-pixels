@@ -2,7 +2,7 @@ import tensorflow as tf
 import game
 import data
 import gym
-from config import NUM_CPUS, NUM_GPUS, TEST_ON_CPU, WORKERS
+from config import NUM_CPUS, NUM_GPUS, NUM_THREADS, USE_GPU, TEST_GPU_ON_CPU, GAMES_PER_ITER_PER_THREAD, WORKERS
 import threading
 import multiprocessing
 from time import sleep
@@ -29,34 +29,31 @@ def test_update(sess, worker, agent):
     np.testing.assert_array_equal(w1,w2)
 
 class Coordinator():
-    '''Wraps a function in order to parallelise it, and calls the a function to create the separate workers
+    '''
+    Wraps a data generating function it's called on to add parallel threads.
+
+    Creates NUM_THREADS workers spread across available devices.
 
     * arguments to __init__:
 
-    condition
-        if False, calling the class as a decorator just returns the decorated function f
-        if True, each worker in the global WORKER list is started in a separate thread on f
+    parallelise
+        if False, calling the class as a decorator on f just returns f
+        otherwise, does all of the parallelising as described above.
 
     * arguments to __call__:
 
     f
         the function to be wrapped
-    args
-        hmmm what are they doing there?
 
-    * comments:
-
-    not sure if the sleep timer is necessary. It's only there because the Juliani functions
-    this was inspired by uses it
     '''
-    def __init__(self, condition):
+    def __init__(self, parallelise):
         # We only want to use the coordinator if the algorithm is run in parallel
-        self.condition = condition
+        self.parallelise = parallelise
         self.coord = tf.train.Coordinator()
         self.workers_have_been_created = False
 
     def __call__(self, f):
-        if self.condition:
+        if self.parallelise:
             def wrapper(*args):
                 sess = args[0]
                 Agent_class = args[1].__class__
@@ -71,39 +68,59 @@ class Coordinator():
                     worker_work = lambda: worker.work(f)
                     t = threading.Thread(target=(worker_work))
                     t.start()
-                    sleep(0.1)
                     threads.append(t)
                 self.coord.join(threads)
             return wrapper
-        return f
+        else:
+            return f
 
 class Worker():
-    '''Executes play function as a separate thread'''
-    def __init__(self, name, Agent_class, gpu_idx, dataset):
-        self.name = "worker_" + str(name)
-        self.train_data = data.Dataset()
-        self.gpu_idx = str(gpu_idx)
+    '''
+    Encapsultes a thread with a copy of the environment and an agent.
+
+    * constructor arguments:
+        Agent_class - class of agent to be instantiated
+        thread      - thread number
+        dataset     - data.Dataset to store the created train data in
+        envname     - the environment name fed into gym.make(envname)
+
+    * attributes:
+        name        - string
+        thread      - int
+        sess        - tf.Session object
+        env         - gym.Env object
+
+    * methods:
+        work(play_function)
+            calls play_function on itself.
+    '''
+    def __init__(self, Agent_class, thread, dataset, envname='Pong-v0'):
+        self.name = "worker_" + str(thread)
+        self.thread = thread
         self.dataset = dataset
         self.sess = None
-        self.env = env = gym.make('Pong-v0')
+        self.env = gym.make(envname)
         self.first_call = True
-        if TEST_ON_CPU:
-            self.device = '/cpu:'
-        else:
+
+        if USE_GPU:
             self.device = '/device:GPU:'
+            self.device_id = str(self.thread % NUM_GPUS)
+        else:
+            self.device = '/cpu:'
+            self.device_id = str(self.thread % NUM_CPUS)
 
         #Create the local copy of the network and the tensorflow op to copy global paramters to local network
-        with tf.device(self.device+self.gpu_idx):
-            with tf.name_scope(name) as scope:
+        with tf.device(self.device+self.device_id):
+            with tf.name_scope(self.name) as scope:
                 self.local_agent = Agent_class(self.name)
                 #should't need to pass the function here, should be able to include arguments
                 self.update_local_ops = update_target_graph
 
     def work(self, play_function):
         if self.first_call:
-            print("Starting play with worker "+self.name+" on GPU "+self.gpu_idx+"...")
+            print("Starting play with {} on device {}...".format(self.name, self.device_id))
             self.first_call = False
-        play_function(self.sess, self.local_agent, self.dataset, self.env, self.name)
+        play_function(self.sess, self.local_agent, self.dataset, self.env, self.name, GAMES_PER_ITER_PER_THREAD)
 
 def create_workers(Agent_class, dataset):
     '''
@@ -116,11 +133,6 @@ def create_workers(Agent_class, dataset):
     dataset
         where to store the work conducted by the workers
     '''
-    num_workers = 4 #make this variable later
     global WORKERS
-    gpu_idx = 0
-    for i in range(num_workers):
-        WORKERS.append(Worker(str(i), Agent_class, gpu_idx, dataset))
-        gpu_idx += 1
-        if gpu_idx > NUM_GPUS-1:
-            gpu_idx = 0
+    for thread in range(NUM_THREADS):
+        WORKERS.append(Worker(Agent_class, thread, dataset))
