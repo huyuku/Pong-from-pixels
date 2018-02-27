@@ -84,6 +84,50 @@ class Dataset():
 		return self.diff_frames[indices], self.actions[indices], self.rewards[indices]
 
 
+
+
+class Scorekeeper():
+	'''
+	This class maintains agent score metrics as games are played.
+
+	* attributes:
+		current_avg
+		previous_avg
+		games_played
+		agent_total
+
+	* methods:
+	    add_game_results(agent_score, opponent_score)
+	    compute_statistics()
+	    update_previous()
+		reset()
+
+	Implementation unfinished: only uses agent_score.
+	'''
+	def __init__(self):
+		self.games_played = 0
+		self.agent_total = 0
+		self.current_avg = 0
+		self.previous_avg = 0
+
+	def add_game_results(self, agent_score, opponent_score):
+		self.games_played += 1
+		self.agent_total += agent_score
+
+	def compute_statistics(self):
+		self.current_avg = self.agent_total / self.games_played
+
+	def update_previous(self):
+		self.compute_statistics()
+		self.previous_avg = self.current_avg
+
+	def reset(self):
+		self.games_played = 0
+		self.agent_total = 0
+		self.current_avg = 0
+
+
+
 #some tests
 def overflow_test():
 	data = Dataset()

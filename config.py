@@ -2,20 +2,18 @@ from tensorflow.python.client import device_lib
 import multiprocessing
 
 #HYPERPARAMETERS AND SETTINGS
-NUM_ITERATIONS = 1
-GAMES_PER_ITER = 80
-EPOCHS_PER_ITER = 40
+NUM_ITERATIONS = 10
+GAMES_PER_ITER = 16
+EPOCHS_PER_ITER = 1
 TRAIN_BATCH_SIZE = 1000
+RANDOM_SAMPLES = True
 
 LEARNING_RATE = 0.0001
 HIDDEN_SIZE = 200
 
-CHALLENGE = False
-NUM_TEST_GAMES = 10
-
 #ANALYTICS AND DEBUGGING
 WITHOUT_NET = False
-QUICK_PLAY = True
+QUICK_PLAY = False
 RENDER = False
 debug = False
 print_analytics = True
@@ -27,7 +25,7 @@ print_analytics = True
 PARALLEL = True
 NUM_THREADS = 8
 USE_GPU = False
-TEST_GPU_ON_CPU = True
+TEST_GPU_ON_CPU = False
 
 #Devices available
 NUM_CPUS = multiprocessing.cpu_count() # Set workers to number of available CPU threads
@@ -39,6 +37,8 @@ assert NUM_THREADS <= NUM_CPUS, "NUM_THREADS is higher than what is supported by
 
 #Some extra configs generated from the above
 GAMES_PER_ITER_PER_THREAD = int(GAMES_PER_ITER / NUM_THREADS)
+if not PARALLEL:
+    NUM_THREADS = 1
 
 #Settings for local debuging on laptop
 

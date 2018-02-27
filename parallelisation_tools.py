@@ -46,33 +46,26 @@ class Coordinator():
         the function to be wrapped
 
     '''
-    def __init__(self, parallelise):
-        # We only want to use the coordinator if the algorithm is run in parallel
-        self.parallelise = parallelise
+    def __init__(self):
         self.coord = tf.train.Coordinator()
-        self.workers_have_been_created = False
+
+    def setup(self, sess, Agent_class, envname, dataset, scorekeeper):
+        create_workers(sess, Agent_class, envname, dataset, scorekeeper)
+        sess.run(tf.global_variables_initializer())
 
     def __call__(self, f):
-        if self.parallelise:
-            def wrapper(*args):
-                sess = args[0]
-                Agent_class = args[1].__class__
-                dataset = args[2]
-                if not self.workers_have_been_created:
-                    create_workers(Agent_class, dataset)
-                    sess.run(tf.global_variables_initializer())
-                    self.workers_have_been_created = True
-                threads = []
-                for worker in WORKERS:
-                    worker.sess = sess
-                    worker_work = lambda: worker.work(f)
-                    t = threading.Thread(target=(worker_work))
-                    t.start()
-                    threads.append(t)
-                self.coord.join(threads)
-            return wrapper
-        else:
-            return f
+        def wrapper(**kwargs):
+            sess = kwargs['sess']
+            dataset = kwargs['dataset']
+            scorekeeper = kwargs['scorekeeper']
+            threads = []
+            for worker in WORKERS:
+                worker_work = lambda: worker.work(f)
+                t = threading.Thread(target=(worker_work))
+                t.start()
+                threads.append(t)
+            self.coord.join(threads)
+        return wrapper
 
 class Worker():
     '''
@@ -94,13 +87,14 @@ class Worker():
         work(play_function)
             calls play_function on itself.
     '''
-    def __init__(self, Agent_class, thread, dataset, envname='Pong-v0'):
+    def __init__(self, sess, Agent_class, thread, dataset, scorekeeper, envname='Pong-v0'):
         self.name = "worker_" + str(thread)
+        self.sess = sess
         self.thread = thread
-        self.dataset = dataset
-        self.sess = None
         self.env = gym.make(envname)
         self.first_call = True
+        self.dataset = dataset
+        self.scorekeeper = scorekeeper
 
         if USE_GPU:
             self.device = '/device:GPU:'
@@ -120,9 +114,15 @@ class Worker():
         if self.first_call:
             print("Starting play with {} on device {}...".format(self.name, self.device_id))
             self.first_call = False
-        play_function(self.sess, self.local_agent, self.dataset, self.env, self.name, GAMES_PER_ITER_PER_THREAD)
+        play_function(sess=self.sess,
+                      dataset=self.dataset,
+                      scorekeeper=self.scorekeeper,
+                      env=self.env,
+                      agent=self.local_agent,
+                      thread=self.name,
+                      games_per_iter=GAMES_PER_ITER_PER_THREAD)
 
-def create_workers(Agent_class, dataset):
+def create_workers(sess, Agent_class, envname, dataset, scorekeeper):
     '''
     Initialises instances of the Worker class for the desired number of parallel threads to run
 
@@ -135,4 +135,13 @@ def create_workers(Agent_class, dataset):
     '''
     global WORKERS
     for thread in range(NUM_THREADS):
-        WORKERS.append(Worker(Agent_class, thread, dataset))
+        print("Creating thread {}...".format(thread), end='\r')
+        WORKERS.append(Worker(sess, Agent_class, thread, dataset, scorekeeper, envname))
+    print()
+
+def update_workers(sess, source_agent):
+    global WORKERS
+    for worker, i in zip(WORKERS, range(len(WORKERS))):
+        print("Updating worker {}/{}...".format(i+1, len(WORKERS)), end="\r")
+        sess.run(worker.update_local_ops(source_agent.name, worker.name))
+    print()
